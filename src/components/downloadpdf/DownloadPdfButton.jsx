@@ -88,7 +88,9 @@ const DownloadPdfButton = ({ address, label = 'Download PDF' }) => {
         // Footer kecil
         doc.setFontSize(10);
         doc.setTextColor(100, 100, 100);
-        doc.text('Verifikasi keaslian sertifikat melalui blockchain', 105, pageHeight - 10, { align: 'center' });
+        doc.text('Verifikasi keaslian sertifikat melalui blockchain', 105, pageHeight - 10, {
+          align: 'center',
+        });
 
         doc.save(`sertifikat-${data.nama || data.penerima}.pdf`);
       });
