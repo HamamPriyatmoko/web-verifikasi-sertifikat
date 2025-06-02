@@ -4,16 +4,14 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import QRCode from 'qrcode';
 
-const DownloadPdfButton = ({ address, label = 'Download PDF' }) => {
+const DownloadPdfButton = ({ id, label = 'Download PDF' }) => {
   const handleDownloadPDF = async () => {
     try {
       // Fetch data sertifikat dari blockchain
-      const res = await fetch('http://localhost:5000/blockchain/sertifikat/by_address', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ address }),
-      });
+      const res = await fetch(`http://localhost:5000/get_data_sertifikat/${id}`);
       const data = await res.json();
+      const { sertifikat } = data;
+      console.log(sertifikat);
       if (data.error) {
         alert('Gagal mengambil data dari blockchain: ' + data.error);
         return;
@@ -24,16 +22,15 @@ const DownloadPdfButton = ({ address, label = 'Download PDF' }) => {
         nama: 'Nama Lengkap',
         universitas: 'Universitas',
         jurusan: 'Jurusan',
-        penerima: 'Alamat Wallet',
         sertifikatToefl: 'Nilai TOEFL',
         sertifikatBTA: 'Nilai BTA',
         sertifikatSKP: 'SKP',
         tanggal: 'Tanggal Terbit',
-        status_publish: 'Status',
+        urlCid: 'Url Cid',
       };
 
-      // Generate QR dari data (boleh juga hanya hash, sesuai kebutuhan)
-      const qrValue = JSON.stringify(data);
+      // Generate QR dari data
+      const qrValue = JSON.stringify(sertifikat);
       QRCode.toDataURL(qrValue, async (err, url) => {
         if (err) {
           alert('Gagal generate QR: ' + err);
@@ -57,13 +54,13 @@ const DownloadPdfButton = ({ address, label = 'Download PDF' }) => {
         doc.text('Diberikan kepada:', 105, 45, { align: 'center' });
         doc.setFontSize(18);
         doc.setFont(undefined, 'bold');
-        doc.text(data.nama || '-', 105, 55, { align: 'center' });
+        doc.text(sertifikat.nama || '-', 105, 55, { align: 'center' });
         doc.setFont(undefined, 'normal');
 
         // Isi detail dalam tabel 2 kolom
         const rows = [];
         Object.entries(fieldLabels).forEach(([key, label]) => {
-          if (data[key]) rows.push([label, data[key]]);
+          if (sertifikat[key]) rows.push([label, sertifikat[key]]);
         });
 
         autoTable(doc, {
@@ -92,7 +89,7 @@ const DownloadPdfButton = ({ address, label = 'Download PDF' }) => {
           align: 'center',
         });
 
-        doc.save(`sertifikat-${data.nama || data.penerima}.pdf`);
+        doc.save(`sertifikat-${sertifikat.nama || sertifikat.id}.pdf`);
       });
     } catch (e) {
       alert('Terjadi error: ' + e.message);
