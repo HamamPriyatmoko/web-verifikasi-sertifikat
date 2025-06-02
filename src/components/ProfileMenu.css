@@ -1,0 +1,45 @@
+.profile-menu {
+  position: relative;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.profile-icon {
+  font-size: 24px;
+  color: white;
+  transition: transform 0.2s ease;
+}
+
+.profile-icon:hover {
+  transform: scale(1.1);
+}
+
+.profile-dropdown {
+  position: absolute;
+  top: 35px;
+  right: 0;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  min-width: 160px;
+  overflow: hidden;
+  z-index: 1000;
+}
+
+.profile-dropdown span {
+  display: block;
+  padding: 10px 16px;
+  font-size: 14px;
+  color: #333;
+  border-bottom: 1px solid #eee;
+  transition: background 0.2s;
+}
+
+.profile-dropdown span:last-child {
+  border-bottom: none;
+}
+
+.profile-dropdown span:hover {
+  background-color: #f2f2f2;
+}

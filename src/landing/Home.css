@@ -1,0 +1,124 @@
+#home-page {
+  font-family: Arial, sans-serif;
+  background: linear-gradient(to bottom right, #4a90e2, #001f4d);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-align: center;
+  padding: 0;
+  margin: 0;
+  position: relative;
+}
+
+.home-navbar {
+  position: absolute;
+  top: 20px;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 20px;
+  align-items: center;
+}
+
+.home-sign-in {
+  background: transparent;
+  color: white;
+  border: 1px solid white;
+  padding: 8px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.home-sign-in:hover {
+  background: white;
+  color: #4a90e2;
+}
+
+.home-site-title {
+  font-size: 25px;
+  font-weight: bold;
+  margin: 0;
+  color: white;
+}
+
+.home-main-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 1;
+  padding-top: 80px;
+}
+
+.home-title {
+  font-size: 32px;
+  color: white;
+  margin-bottom: 20px;
+}
+
+.home-input-group {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+  width: 100%;
+  max-width: 900px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.home-input-box {
+  padding: 15px;
+  font-size: 18px;
+  border-radius: 6px;
+  border: none;
+  width: 100%;
+  flex-grow: 1;
+}
+
+.home-verify-btn {
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 15px 20px;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.home-verify-btn:hover {
+  background-color: #218838;
+}
+
+.home-button-group {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 10px;
+}
+
+.home-select-btn,
+.home-camera-btn {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.home-select-btn:hover,
+.home-camera-btn:hover {
+  background-color: #0056b3;
+}
+
+.home-footer {
+  text-align: center;
+  color: white;
+  font-size: 14px;
+  padding: 20px;
+  opacity: 0.9;
+}

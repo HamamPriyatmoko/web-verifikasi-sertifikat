@@ -1,0 +1,23 @@
+.main-layout {
+  display: flex;
+  min-height: 100vh;
+  background: #e8f0fe; /* Match the background color */
+}
+
+.main-content {
+  flex-grow: 1;
+  margin-left: 200px; /* Offset for sidebar width (assumed 200px) */
+  width: calc(100% - 200px); /* Ensure it takes the remaining space */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+  .main-content {
+    margin-left: 0; /* Remove offset if sidebar collapses on mobile */
+    width: 100%;
+  }
+}

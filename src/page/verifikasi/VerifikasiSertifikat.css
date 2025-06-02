@@ -1,0 +1,350 @@
+.verifikasi-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: #e8f0fe;
+  padding: 20px;
+}
+
+.verifikasi-main-content {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.verifikasi-content {
+  width: 900px;
+  max-width: 900px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  margin: 0 auto;
+}
+
+.verifikasi-title {
+  font-size: 24px;
+  color: #333;
+  margin-bottom: 20px;
+  font-weight: 600;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.verifikasi-input-group {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.verifikasi-input-box {
+  padding: 12px;
+  font-size: 14px;
+  border-radius: 6px;
+  border: 1px solid #dfe1e5;
+  width: 100%;
+  flex-grow: 1;
+  background-color: #f5f5f5;
+  color: #333;
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.verifikasi-input-box::placeholder {
+  color: #999;
+}
+
+.verifikasi-input-box:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+}
+
+.verifikasi-verify-btn {
+  background: rgba(19, 223, 43, 0.921);
+  color: #333;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 100px;
+}
+
+.verifikasi-verify-btn:disabled {
+  background: #e0e0e0;
+  cursor: not-allowed;
+}
+
+.verifikasi-verify-btn:hover:not(:disabled) {
+  background: #b0b0b0;
+}
+
+.loading-spinner {
+  border: 3px solid #ffffff;
+  border-top: 3px solid #333;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.verifikasi-button-group {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin: 20px 0;
+}
+
+.verifikasi-camera-btn {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+}
+
+.verifikasi-camera-btn:hover:not(:disabled) {
+  background: #0056b3;
+}
+
+.verifikasi-camera-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+.verifikasi-scanner-container {
+  position: relative;
+  margin: 20px auto;
+  width: 100%;
+  max-width: 400px;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.verifikasi-scanner {
+  width: 100%;
+  aspect-ratio: 1;
+  background: #000;
+}
+
+.scanner-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.scanner-line {
+  width: 80%;
+  height: 2px;
+  background: #007bff;
+  animation: scan 2s ease-in-out infinite;
+}
+
+@keyframes scan {
+  0% {
+    transform: translateY(-40%);
+  }
+  50% {
+    transform: translateY(40%);
+  }
+  100% {
+    transform: translateY(-40%);
+  }
+}
+
+.verifikasi-preview {
+  margin: 20px auto;
+  width: 95%;
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.verifikasi-preview h4 {
+  font-size: 18px;
+  color: #333;
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+/* New styles for structured data display */
+.verifikasi-data-table {
+  width: 95%;
+  border: 1px solid #dfe1e5;
+  border-radius: 6px;
+  background: #fff;
+  padding: 15px;
+  margin: 20px auto;
+}
+
+.verifikasi-data-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid #dfe1e5;
+}
+
+.verifikasi-data-row:last-child {
+  border-bottom: none;
+}
+
+.verifikasi-data-label {
+  font-weight: 500;
+  color: #333;
+  flex: 1;
+}
+
+.verifikasi-data-value {
+  color: #666;
+  flex: 2;
+  text-align: left;
+  word-break: break-all;
+}
+
+.verifikasi-result {
+  width: 100%;
+  margin: 20px auto;
+  text-align: center;
+}
+
+.verifikasi-error {
+  color: #dc3545;
+  font-size: 16px;
+  background: #f8d7da;
+  padding: 12px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+}
+
+.verifikasi-empty {
+  color: #666;
+  font-size: 14px;
+  margin-top: 20px;
+  text-align: center;
+}
+
+/* Modal styles */
+.verifikasi-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.verifikasi-modal {
+  background: #fff;
+  border-radius: 12px;
+  padding: 20px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+.verifikasi-modal h3 {
+  font-size: 20px;
+  color: #333;
+  margin-bottom: 20px;
+  font-weight: 600;
+  text-align: center;
+}
+
+.verifikasi-modal-content {
+  margin-bottom: 20px;
+}
+
+.verifikasi-modal-close-btn {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  display: block;
+  margin: 0 auto;
+  transition: background 0.3s ease;
+}
+
+.verifikasi-modal-close-btn:hover {
+  background: #c82333;
+}
+
+@media (max-width: 768px) {
+  .verifikasi-content {
+    width: 90%;
+    max-width: 90%;
+    margin: 0 auto;
+  }
+
+  .verifikasi-title {
+    font-size: 20px;
+  }
+
+  .verifikasi-input-group {
+    flex-direction: column;
+  }
+
+  .verifikasi-input-box,
+  .verifikasi-verify-btn,
+  .verifikasi-camera-btn {
+    font-size: 14px;
+  }
+
+  .verifikasi-scanner-container {
+    max-width: 90%;
+  }
+
+  .verifikasi-data-row {
+    flex-direction: column;
+    gap: 5px;
+  }
+
+  .verifikasi-data-label,
+  .verifikasi-data-value {
+    text-align: left;
+  }
+}

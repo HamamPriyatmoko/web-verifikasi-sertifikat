@@ -1,0 +1,19 @@
+/* Reset global styling */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+}
+
+/* Styling khusus halaman Home */
+#home-page {
+  /* background: linear-gradient(to bottom right, #4a90e2, #001f4d); */
+  /* color: white; */
+  text-align: center;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
