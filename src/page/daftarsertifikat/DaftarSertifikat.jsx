@@ -32,6 +32,7 @@ const DaftarSertifikat = () => {
           (item.jurusan && item.jurusan.toLowerCase().includes(term.toLowerCase())),
       ),
     );
+    setCurrentPage(1); // reset ke halaman 1 saat pencarian berubah
   };
 
   // Pagination
@@ -55,80 +56,81 @@ const DaftarSertifikat = () => {
   };
 
   return (
-    <>
-      <div id="daftar-page">
-        <div className="ds-wrapper">
-          <main className="ds-container">
-            <div className="ds-header">
-              <h2 className="ds-heading">Daftar Sertifikat</h2>
-              <div className="ds-header-actions">
-                <div className="ds-search-container">
-                  <FaSearch className="ds-search-icon" />
-                  <input
-                    type="text"
-                    className="ds-search-bar"
-                    placeholder="Cari nama atau jurusan"
-                    value={searchTerm}
-                    onChange={handleSearch}
-                  />
-                </div>
-                <select
-                  className="ds-items-per-page"
-                  value={itemsPerPage}
-                  onChange={(e) => setItemsPerPage(Number(e.target.value))}>
-                  <option value={5}>Showing 5</option>
-                  <option value={10}>Showing 10</option>
-                  <option value={15}>Showing 15</option>
-                </select>
+    <div id="daftar-page">
+      <div className="ds-wrapper">
+        <main className="ds-container">
+          <div className="ds-header">
+            <h2 className="ds-heading">Daftar Sertifikat</h2>
+            <div className="ds-header-actions">
+              <div className="ds-search-container">
+                <FaSearch className="ds-search-icon" />
+                <input
+                  type="text"
+                  className="ds-search-bar"
+                  placeholder="Cari nama atau jurusan"
+                  value={searchTerm}
+                  onChange={handleSearch}
+                />
               </div>
+              <select
+                className="ds-items-per-page"
+                value={itemsPerPage}
+                onChange={(e) => {
+                  setItemsPerPage(Number(e.target.value));
+                  setCurrentPage(1); // reset ke halaman 1 saat itemsPerPage berubah
+                }}>
+                <option value={5}>Showing 5</option>
+                <option value={10}>Showing 10</option>
+                <option value={15}>Showing 15</option>
+              </select>
             </div>
+          </div>
 
-            <table className="ds-daftar-table">
-              <thead>
-                <tr>
-                  <th>Foto</th>
-                  <th>Nama</th>
-                  <th>Jurusan</th>
-                  <th>Universitas</th>
-                  <th>Action</th>
+          <table className="ds-daftar-table">
+            <thead>
+              <tr>
+                <th>Foto</th>
+                <th>Nama</th>
+                <th>Jurusan</th>
+                <th>Universitas</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {currentItems.map((item) => (
+                <tr key={item.id}>
+                  <td>
+                    <div
+                      className="ds-user-photo"
+                      style={{ backgroundColor: '#007bff', color: '#fff' }}>
+                      {getInitial(item.nama)}
+                    </div>
+                  </td>
+                  <td>{item.nama || '-'}</td>
+                  <td>{item.jurusan || '-'}</td>
+                  <td>{item.universitas || '-'}</td>
+                  <td>
+                    <DownloadPdfButton id={item.id} className="ds-action-btn ds-download-btn" />
+                  </td>
                 </tr>
-              </thead>
-              <tbody>
-                {currentItems.map((item) => (
-                  <tr key={item.id}>
-                    <td>
-                      <div
-                        className="ds-user-photo"
-                        style={{ backgroundColor: '#007bff', color: '#fff' }}>
-                        {getInitial(item.nama)}
-                      </div>
-                    </td>
-                    <td>{item.nama || '-'}</td>
-                    <td>{item.jurusan || '-'}</td>
-                    <td>{item.universitas || '-'}</td>
-                    <td>
-                      <DownloadPdfButton id={item.id} className="ds-action-btn ds-download-btn" />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-
-            <div className="ds-pagination">
-              {pageNumbers.map((number) => (
-                <button
-                  key={number}
-                  className={`ds-page-btn ${currentPage === number ? 'ds-active' : ''}`}
-                  onClick={() => handlePageChange(number)}>
-                  {number}
-                </button>
               ))}
-            </div>
-          </main>
-          <Footer />
-        </div>
+            </tbody>
+          </table>
+
+          <div className="ds-pagination">
+            {pageNumbers.map((number) => (
+              <button
+                key={number}
+                className={`ds-page-btn ${currentPage === number ? 'ds-active' : ''}`}
+                onClick={() => handlePageChange(number)}>
+                {number}
+              </button>
+            ))}
+          </div>
+        </main>
+        <Footer />
       </div>
-    </>
+    </div>
   );
 };
 

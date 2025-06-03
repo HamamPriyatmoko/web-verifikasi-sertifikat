@@ -1,16 +1,16 @@
-/* Sidebar style */
+/* --- Sidebar Styles (Sidebar.css) --- */
 .sidebar {
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   align-items: flex-start;
   padding: 20px 20px;
-  background: linear-gradient(to right, #4a90e2, #001f4d);
+  background: linear-gradient(to bottom, #2c5282, #001f4d);
   color: white;
-  width: 250px; /* Lebar sidebar */
-  height: 100vh; /* Mengatur tinggi untuk memenuhi seluruh layar */
+  width: 250px;
+  height: 100vh;
   box-sizing: border-box;
-  position: fixed; /* Membuat sidebar tetap di posisi */
+  position: fixed;
   z-index: 1000;
   top: 0;
   left: 0;
@@ -19,13 +19,15 @@
 .sidebar-logo {
   font-size: 24px;
   font-weight: bold;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
+  line-height: 1.2;
 }
 
 .sidebar-nav-links {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 15px;
+  width: 100%;
 }
 
 .sidebar-nav-links a {
@@ -33,42 +35,53 @@
   color: white;
   font-weight: 500;
   font-size: 16px;
-  transition: color 0.3s;
+  padding: 10px 15px;
+  border-radius: 6px;
+  transition: background-color 0.3s, color 0.3s;
 }
 
 .sidebar-nav-links a.active {
+  background-color: rgba(255, 255, 255, 0.1);
   border-left: 4px solid white;
-  padding-left: 8px;
+  padding-left: 11px;
+  font-weight: bold;
 }
 
-.sidebar-nav-links a:hover {
-  color: #ddd;
+.sidebar-nav-links a:hover:not(.active) {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #e0e0e0;
 }
 
-.sidebar-profile {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-top: auto; /* Menempatkan profile di bagian bawah */
-}
+/* Responsive Sidebar Styles */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: relative;
+    flex-direction: column;
+    align-items: center;
+  }
 
-.profile-icon {
-  font-size: 24px;
-  color: white;
-}
+  .sidebar-logo {
+    font-size: 20px;
+    text-align: center;
+    margin-bottom: 15px;
+  }
 
-.logout-btn {
-  background: white;
-  color: #004aad;
-  border: none;
-  padding: 6px 14px;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: 500;
-  font-size: 14px;
-  transition: background 0.3s ease;
-}
-
-.logout-btn:hover {
-  background-color: #f2f2f2;
+  .sidebar-nav-links {
+    flex-direction: row;
+    justify-content: space-around;
+    gap: 10px;
+    width: 100%;
+    margin-bottom: 15px;
+  }
+  .sidebar-nav-links a {
+    padding: 8px 10px;
+    font-size: 14px;
+  }
+  .sidebar-nav-links a.active {
+    border-left-width: 0;
+    border-bottom: 3px solid white;
+    padding-left: 10px;
+  }
 }

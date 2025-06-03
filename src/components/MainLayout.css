@@ -1,23 +1,28 @@
+/* --- MainLayout Styles (MainLayout.css) --- */
 .main-layout {
   display: flex;
   min-height: 100vh;
-  background: #e8f0fe; /* Match the background color */
 }
 
 .main-content {
   flex-grow: 1;
-  margin-left: 200px; /* Offset for sidebar width (assumed 200px) */
-  width: calc(100% - 200px); /* Ensure it takes the remaining space */
+  margin-left: 250px;
   display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
+  flex-direction: column;
+  padding: 0;
   overflow-y: auto;
+  height: 100vh;
 }
 
+/* Responsive MainLayout Styles */
 @media (max-width: 768px) {
+  .main-layout {
+    flex-direction: column;
+  }
   .main-content {
-    margin-left: 0; /* Remove offset if sidebar collapses on mobile */
+    margin-left: 0;
     width: 100%;
+    height: auto;
+    overflow-y: visible;
   }
 }

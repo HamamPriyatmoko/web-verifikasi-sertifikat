@@ -1,29 +1,65 @@
-.verifikasi-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background: #e8f0fe;
-  padding: 20px;
-}
+/* ------------------------------
+   Bagian 1: Perlebar card saja
+   ------------------------------ */
 
-.verifikasi-main-content {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+/* Temukan aturan .verifikasi-content (sekitar baris 15–25) 
+   lalu ubah menjadi seperti di bawah. */
 
 .verifikasi-content {
-  width: 900px;
-  max-width: 900px;
+  width: 100%;
+  /* Naikkan max-width menjadi 1200px (atau bebas mau dilepas) */
+  max-width: 1200px;  
   background: #ffffff;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   padding: 30px;
-  margin: 0 auto;
+  margin: 0;      /* Hilangkan margin bawah */
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
 }
 
+/* Jika Anda benar‐benar ingin agar card mengambil 100% lebar dan tidak 
+   dibatasi sama sekali, cukup hilangkan baris max-width di atas. */
+
+/* ----------------------------------------------------------
+   Bagian lain dari VerifikasiSertifikat.css (tidak berubah)
+   ---------------------------------------------------------- */
+
+/* 1. Container Utama */
+.verifikasi-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: linear-gradient(180deg, #e8f0fe 0%, #f2f6fb 100%);
+  padding: 20px 40px 10px 40px;
+  box-sizing: border-box;
+}
+
+/* 2. Main Content (Card) Menempel Kiri */
+.verifikasi-main-content {
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  flex: 1;
+  width: 100%;
+}
+
+/* 3. Card (diubah di bagian atas) */
+.verifikasi-content {
+  width: 100%;
+  max-width: 1200px; /* dinaikkan dari 900px */
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  margin: 0;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 4. Judul */
 .verifikasi-title {
   font-size: 24px;
   color: #333;
@@ -33,6 +69,7 @@
   text-transform: uppercase;
 }
 
+/* 5. Input Hash & Tombol Verifikasi */
 .verifikasi-input-group {
   display: flex;
   gap: 10px;
@@ -89,24 +126,7 @@
   background: #b0b0b0;
 }
 
-.loading-spinner {
-  border: 3px solid #ffffff;
-  border-top: 3px solid #333;
-  border-radius: 50%;
-  width: 20px;
-  height: 20px;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
+/* 6. Tombol Scan QR */
 .verifikasi-button-group {
   display: flex;
   justify-content: center;
@@ -138,11 +158,19 @@
   cursor: not-allowed;
 }
 
+/* 7. Teks Instruksi / Empty State */
+.verifikasi-empty {
+  color: #666;
+  font-size: 14px;
+  text-align: center;
+}
+
+/* 8. QR SCANNER CONTAINER */
 .verifikasi-scanner-container {
   position: relative;
-  margin: 20px auto;
+  margin: 20px 0;
   width: 100%;
-  max-width: 400px;
+  max-width: 500px; /* usahakan scanner juga melebar supaya matching dengan card */
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -185,9 +213,11 @@
   }
 }
 
+/* 9. PREVIEW DATA DARI QR */
 .verifikasi-preview {
-  margin: 20px auto;
-  width: 95%;
+  margin: 20px 0;
+  width: 100%;
+  max-width: 1200px; /* sesuaikan */
   background: #f8f9fa;
   padding: 20px;
   border-radius: 8px;
@@ -201,14 +231,15 @@
   font-weight: 600;
 }
 
-/* New styles for structured data display */
+/* 10. TABEL DATA TERSTRUKTUR */
 .verifikasi-data-table {
-  width: 95%;
+  width: 100%;
   border: 1px solid #dfe1e5;
   border-radius: 6px;
   background: #fff;
   padding: 15px;
-  margin: 20px auto;
+  margin: 20px 0;
+  box-sizing: border-box;
 }
 
 .verifikasi-data-row {
@@ -235,9 +266,10 @@
   word-break: break-all;
 }
 
+/* 11. PESAN ERROR / ISI AWAL */
 .verifikasi-result {
   width: 100%;
-  margin: 20px auto;
+  margin: 20px 0;
   text-align: center;
 }
 
@@ -250,14 +282,7 @@
   margin-bottom: 20px;
 }
 
-.verifikasi-empty {
-  color: #666;
-  font-size: 14px;
-  margin-top: 20px;
-  text-align: center;
-}
-
-/* Modal styles */
+/* 12. MODAL HASIL VERIFIKASI */
 .verifikasi-modal-overlay {
   position: fixed;
   top: 0;
@@ -281,6 +306,7 @@
   overflow-y: auto;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   position: relative;
+  box-sizing: border-box;
 }
 
 .verifikasi-modal h3 {
@@ -295,6 +321,21 @@
   margin-bottom: 20px;
 }
 
+/* Tampilan data dalam modal */
+.verifikasi-modal .verifikasi-data-table {
+  margin: 0;
+}
+
+.verifikasi-modal .verifikasi-data-row {
+  padding: 6px 0;
+}
+
+.verifikasi-modal .verifikasi-data-label,
+.verifikasi-modal .verifikasi-data-value {
+  flex: 1 1 auto;
+}
+
+/* 13. TOMBOL TUTUP MODAL */
 .verifikasi-modal-close-btn {
   background: #dc3545;
   color: white;
@@ -313,38 +354,40 @@
   background: #c82333;
 }
 
+/* 14. RESPONSIVE (≤768px) */
 @media (max-width: 768px) {
-  .verifikasi-content {
-    width: 90%;
-    max-width: 90%;
-    margin: 0 auto;
+  .verifikasi-container {
+    padding: 20px 20px 10px 20px;
   }
-
+  .verifikasi-main-content {
+    flex-direction: column;
+    align-items: center;
+  }
+  .verifikasi-content {
+    width: 100%;
+    max-width: 100%;
+    padding: 20px;
+    margin: 0;
+  }
   .verifikasi-title {
     font-size: 20px;
   }
-
   .verifikasi-input-group {
     flex-direction: column;
+    gap: 10px;
   }
-
   .verifikasi-input-box,
   .verifikasi-verify-btn,
   .verifikasi-camera-btn {
     font-size: 14px;
   }
-
   .verifikasi-scanner-container {
-    max-width: 90%;
+    max-width: 100%;
   }
-
-  .verifikasi-data-row {
-    flex-direction: column;
-    gap: 5px;
+  .verifikasi-preview {
+    max-width: 100%;
   }
-
-  .verifikasi-data-label,
-  .verifikasi-data-value {
-    text-align: left;
+  .verifikasi-data-table {
+    font-size: 13px;
   }
 }

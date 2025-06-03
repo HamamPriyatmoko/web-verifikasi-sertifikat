@@ -2,102 +2,255 @@ import React, { useState } from 'react';
 import './Dashboard.css';
 import Footer from '../../components/Footer';
 
-const Dashboard = () => {
-  const [formData, setFormData] = useState({
-    nama: '',
-    email: '',
-    kursus: '',
-    deskripsi: '',
-    terbit: '',
-  });
+const initialState = {
+  nama: '',
+  universitas: '',
+  jurusan: '',
+  sertifikatToefl: '',
+  sertifikatBTA: '',
+  sertifikatSKP: '',
+  tanggal: '',
+};
 
-  const [errors, setErrors] = useState({
-    nama: '',
-    email: '',
-    kursus: '',
-    deskripsi: '',
-    terbit: '',
-  });
+const Dashboard = () => {
+  const [formData, setFormData] = useState(initialState);
+  const [errors, setErrors] = useState({});
+  const [statusMsg, setStatusMsg] = useState('');
+
+  const universitasList = [
+    'Universitas Muhammadiyah Yogyakarta',
+    'Universitas Gadjah Mada',
+    'Institut Teknologi Bandung',
+    'Universitas Indonesia',
+  ];
+
+  const jurusanList = [
+    'Teknologi Informasi',
+    'Teknik Elektro',
+    'Ilmu Komputer',
+    'Sistem Informasi',
+    'Teknik Mesin',
+  ];
+
+  const validateForm = () => {
+    const newErrors = {};
+    if (!formData.nama) newErrors.nama = 'Nama wajib diisi';
+    if (!formData.universitas) newErrors.universitas = 'Pilih universitas';
+    if (!formData.jurusan) newErrors.jurusan = 'Pilih jurusan';
+    if (!formData.sertifikatToefl) newErrors.sertifikatToefl = 'No. Sertifikat TOEFL wajib diisi';
+    if (!formData.sertifikatBTA) newErrors.sertifikatBTA = 'No. Sertifikat BTA wajib diisi';
+    if (!formData.sertifikatSKP) newErrors.sertifikatSKP = 'No. Sertifikat SKP wajib diisi';
+    if (!formData.tanggal) newErrors.tanggal = 'Tanggal wajib diisi';
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
+    if (errors[e.target.name]) {
+      setErrors({
+        ...errors,
+        [e.target.name]: null,
+      });
+    }
   };
 
-  const validateForm = () => {
-    const newErrors = {};
-    if (!formData.nama) newErrors.nama = 'Nama lengkap tidak boleh kosong';
-    if (!formData.email) newErrors.email = 'Email tidak boleh kosong';
-    if (!formData.kursus) newErrors.kursus = 'Pilih kursus yang diikuti';
-    if (!formData.deskripsi) newErrors.deskripsi = 'Deskripsi tidak boleh kosong';
-    if (!formData.terbit) newErrors.terbit = 'Tanggal terbit tidak boleh kosong';
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (validateForm()) {
-      console.log('Data Form:', formData);
-      // Lakukan aksi lain seperti mengirim data ke server
+    setStatusMsg('');
+    if (!validateForm()) {
+      setStatusMsg('Harap perbaiki error pada form.');
+      return;
+    }
+
+    setStatusMsg('Menerbitkan sertifikat ke blockchain...');
+    try {
+      const res = await fetch('http://127.0.0.1:5000/terbitkan_sertifikat_blockchain', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData),
+      });
+      const data = await res.json();
+      if (res.ok && data.transaction_hash) {
+        setStatusMsg('Sukses! Sertifikat telah diterbitkan di blockchain.');
+        setFormData(initialState);
+        setErrors({});
+      } else {
+        setStatusMsg(data.error || 'Gagal menerbitkan sertifikat. Coba lagi.');
+      }
+    } catch (err) {
+      setStatusMsg('Terjadi kesalahan koneksi. Pastikan server backend berjalan.');
+      console.error('API call failed:', err);
     }
   };
 
   return (
-    <>
-      <div id="dashboard-page">
-        <main className="dashboard-container">
+    <div className="dashboard-page-content">
+      <main className="dashboard-container">
+        <div className="dashboard-header">
           <h2 className="dashboard-heading">Terbitkan Sertifikat</h2>
-          <p className="dashboard-subtext">Isi data penerima sertifikat di bawah ini dengan lengkap dan benar.</p>
+          <p className="dashboard-subtext">
+            Isi data sertifikat di bawah ini dengan lengkap dan benar. Semua field wajib diisi.
+          </p>
+        </div>
 
-          <form onSubmit={handleSubmit} className="dashboard-form">
+        <form onSubmit={handleSubmit} className="dashboard-form">
+          <div className="dashboard-card">
+            <div className="dashboard-form-group">
+              <label htmlFor="nama" className="dashboard-label">
+                Nama Lengkap
+              </label>
+              <input
+                id="nama"
+                name="nama"
+                type="text"
+                placeholder="Contoh: Budi Santoso"
+                value={formData.nama}
+                onChange={handleChange}
+                className={`dashboard-input ${errors.nama ? 'input-error' : ''}`}
+              />
+              {errors.nama && <p className="error-text">{errors.nama}</p>}
+            </div>
+
             <div className="dashboard-form-row">
               <div className="dashboard-form-group">
-                <label htmlFor="nama">Nama Lengkap</label>
-                <input id="nama" name="nama" type="text" placeholder="Contoh: Budi Santoso" value={formData.nama} onChange={handleChange} aria-label="Nama Lengkap" />
-                {errors.nama && <p className="error-text">{errors.nama}</p>}
+                <label htmlFor="universitas" className="dashboard-label">
+                  Universitas
+                </label>
+                <select
+                  id="universitas"
+                  name="universitas"
+                  value={formData.universitas}
+                  onChange={handleChange}
+                  className={`dashboard-input ${errors.universitas ? 'input-error' : ''}`}>
+                  <option value="">-- Pilih Universitas --</option>
+                  {universitasList.map((u) => (
+                    <option key={u} value={u}>
+                      {u}
+                    </option>
+                  ))}
+                </select>
+                {errors.universitas && <p className="error-text">{errors.universitas}</p>}
               </div>
               <div className="dashboard-form-group">
-                <label htmlFor="email">Email Aktif</label>
-                <input id="email" name="email" type="email" placeholder="Contoh: budi@email.com" value={formData.email} onChange={handleChange} aria-label="Email Aktif" />
-                {errors.email && <p className="error-text">{errors.email}</p>}
+                <label htmlFor="jurusan" className="dashboard-label">
+                  Jurusan
+                </label>
+                <select
+                  id="jurusan"
+                  name="jurusan"
+                  value={formData.jurusan}
+                  onChange={handleChange}
+                  className={`dashboard-input ${errors.jurusan ? 'input-error' : ''}`}>
+                  <option value="">-- Pilih Jurusan --</option>
+                  {jurusanList.map((j) => (
+                    <option key={j} value={j}>
+                      {j}
+                    </option>
+                  ))}
+                </select>
+                {errors.jurusan && <p className="error-text">{errors.jurusan}</p>}
+              </div>
+            </div>
+
+            <div className="dashboard-form-row">
+              <div className="dashboard-form-group">
+                <label htmlFor="sertifikatToefl" className="dashboard-label">
+                  No. Sertifikat TOEFL
+                </label>
+                <input
+                  id="sertifikatToefl"
+                  name="sertifikatToefl"
+                  type="text"
+                  placeholder="Contoh: 1234567890"
+                  value={formData.sertifikatToefl}
+                  onChange={handleChange}
+                  className={`dashboard-input ${errors.sertifikatToefl ? 'input-error' : ''}`}
+                />
+                {errors.sertifikatToefl && <p className="error-text">{errors.sertifikatToefl}</p>}
+              </div>
+              <div className="dashboard-form-group">
+                <label htmlFor="sertifikatBTA" className="dashboard-label">
+                  No. Sertifikat BTA
+                </label>
+                <input
+                  id="sertifikatBTA"
+                  name="sertifikatBTA"
+                  type="text"
+                  placeholder="Contoh: 1234567890"
+                  value={formData.sertifikatBTA}
+                  onChange={handleChange}
+                  className={`dashboard-input ${errors.sertifikatBTA ? 'input-error' : ''}`}
+                />
+                {errors.sertifikatBTA && <p className="error-text">{errors.sertifikatBTA}</p>}
               </div>
             </div>
 
             <div className="dashboard-form-group">
-              <label htmlFor="kursus">Nama Kursus / Sertifikasi</label>
-              <select id="kursus" name="kursus" value={formData.kursus} onChange={handleChange} aria-label="Nama Kursus">
-                <option value="">-- Pilih Kursus --</option>
-                <option value="React Developer Bootcamp">React Developer Bootcamp</option>
-                <option value="Blockchain Certificate Mastery">Blockchain Certificate Mastery</option>
-                <option value="UI/UX Design Fundamentals">UI/UX Design Fundamentals</option>
-                <option value="Cybersecurity Essentials">Cybersecurity Essentials</option>
-                <option value="Data Science with Python">Data Science with Python</option>
-              </select>
-              {errors.kursus && <p className="error-text">{errors.kursus}</p>}
+              <label htmlFor="sertifikatSKP" className="dashboard-label">
+                No. Sertifikat SKP
+              </label>
+              <input
+                id="sertifikatSKP"
+                name="sertifikatSKP"
+                type="text"
+                placeholder="Contoh: 1234567890"
+                value={formData.sertifikatSKP}
+                onChange={handleChange}
+                className={`dashboard-input ${errors.sertifikatSKP ? 'input-error' : ''}`}
+              />
+              {errors.sertifikatSKP && <p className="error-text">{errors.sertifikatSKP}</p>}
             </div>
 
             <div className="dashboard-form-group">
-              <label htmlFor="deskripsi">Deskripsi Singkat</label>
-              <input id="deskripsi" name="deskripsi" type="text" placeholder="Contoh: Peserta aktif dengan hasil memuaskan" value={formData.deskripsi} onChange={handleChange} aria-label="Deskripsi Singkat" />
-              {errors.deskripsi && <p className="error-text">{errors.deskripsi}</p>}
+              <label htmlFor="tanggal" className="dashboard-label">
+                Tanggal Terbit
+              </label>
+              <input
+                id="tanggal"
+                name="tanggal"
+                type="date"
+                value={formData.tanggal}
+                onChange={handleChange}
+                className={`dashboard-input ${errors.tanggal ? 'input-error' : ''}`}
+              />
+              {errors.tanggal && <p className="error-text">{errors.tanggal}</p>}
             </div>
+          </div>
 
-            <div className="dashboard-form-group">
-              <label htmlFor="terbit">Tanggal Terbit</label>
-              <input id="terbit" name="terbit" type="date" value={formData.terbit} onChange={handleChange} aria-label="Tanggal Terbit" />
-              {errors.terbit && <p className="error-text">{errors.terbit}</p>}
-            </div>
+          <div className="dashboard-form-action">
+            <button type="submit" className="dashboard-button">
+              Terbitkan Sertifikat
+            </button>
+          </div>
+        </form>
 
-            <div className="dashboard-form-action">
-              <button type="submit">Terbitkan Sertifikat</button>
-            </div>
-          </form>
-        </main>
-      </div>
-    </>
+        {statusMsg && (
+          <div className="dashboard-status">
+            <p
+              className={`status-text ${
+                statusMsg.includes('Sukses')
+                  ? 'success'
+                  : statusMsg.includes('Harap perbaiki')
+                  ? 'error'
+                  : statusMsg.includes('Gagal')
+                  ? 'error'
+                  : 'info'
+              }`}>
+              {statusMsg}
+            </p>
+          </div>
+        )}
+
+        {/* Komponen Footer */}
+        <div className="dashboard-footer-wrapper">
+          <Footer />
+        </div>
+      </main>
+    </div>
   );
 };
 

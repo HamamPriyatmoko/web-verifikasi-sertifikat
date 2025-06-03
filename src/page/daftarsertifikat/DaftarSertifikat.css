@@ -1,3 +1,4 @@
+/* --- Root container untuk halaman Daftar Sertifikat --- */
 #daftar-page {
   background-color: #e8f0fe;
   min-height: 100vh;
@@ -6,26 +7,29 @@
   font-family: Arial, sans-serif;
 }
 
+/* --- Wrapper yang berada di dalam MainLayout --- */
 .ds-wrapper {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
   width: 100%;
-  margin-left: 250px; /* Match sidebar width from MainLayout */
+  /* Hilangkan margin-left: 250px; karena MainLayout sudah menambah offset sidebar */
 }
 
+/* --- Container utama (kartu putih) --- */
 .ds-container {
   width: 100%;
   padding: 30px 40px;
   box-sizing: border-box;
   background: #ffffff;
-  border-radius: 12px 12px 0 0; /* Rounded top corners only */
+  border-radius: 12px 12px 0 0; /* Rounded top corners saja */
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  flex-grow: 1; /* Allow container to grow and push footer down */
+  flex-grow: 1; /* Membuat area table dan footer mendorong hingga bawah */
 }
 
+/* --- Header daftar sertifikat --- */
 .ds-header {
   display: flex;
   justify-content: space-between;
@@ -33,7 +37,7 @@
   margin-bottom: 20px;
   background: linear-gradient(90deg, #007bff, #0056b3);
   padding: 15px 20px;
-  border-radius: 10px 10px 0 0; /* Rounded top corners only */
+  border-radius: 10px 10px 0 0; /* Rounded top corners saja */
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
@@ -50,8 +54,8 @@
   gap: 15px;
 }
 
-.ds-search-container,
-.ds-filter-container {
+/* --- Kotak Pencarian --- */
+.ds-search-container {
   display: flex;
   align-items: center;
   background: #ffffff;
@@ -60,8 +64,7 @@
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.ds-search-icon,
-.ds-filter-icon {
+.ds-search-icon {
   margin-right: 8px;
   font-size: 16px;
   color: #007bff;
@@ -76,23 +79,26 @@
   background: transparent;
 }
 
-.ds-filter-dropdown,
+/* --- Dropdown untuk Items per page --- */
 .ds-items-per-page {
   padding: 6px 10px;
   font-size: 14px;
   border: none;
   outline: none;
-  background: transparent;
+  background: #ffffff;
+  border-radius: 5px;
   color: #333;
   cursor: pointer;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
+/* --- Tabel Daftar Sertifikat --- */
 .ds-daftar-table {
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
   font-size: 14px;
-  border-radius: 0 0 10px 10px; /* Rounded bottom corners only */
+  border-radius: 0 0 10px 10px; /* Rounded bottom corners saja */
   overflow: hidden;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
@@ -125,6 +131,7 @@
   background-color: #f0f7ff;
 }
 
+/* --- Avatar/Foto user (Inisial) --- */
 .ds-user-photo {
   width: 40px;
   height: 40px;
@@ -138,17 +145,7 @@
   margin: 0 auto;
 }
 
-.ds-status-badge {
-  padding: 5px 10px;
-  border-radius: 10px;
-  color: #ffffff;
-  font-weight: 500;
-  text-transform: capitalize;
-  font-size: 12px;
-  display: inline-block;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-}
-
+/* --- Tombol Aksi (Download PDF) --- */
 .ds-action-btn {
   padding: 6px 12px;
   border: none;
@@ -163,13 +160,8 @@
   margin: 0 auto;
 }
 
-.ds-publish-btn {
-  background: linear-gradient(90deg, #ff9800, #f57c00); /* Orange for "Publish" */
-  color: #ffffff;
-}
-
 .ds-download-btn {
-  background: linear-gradient(90deg, #4caf50, #2e7d32); /* Green for "Download PDF" */
+  background: linear-gradient(90deg, #4caf50, #2e7d32); /* Hijau untuk "Download PDF" */
   color: #ffffff;
 }
 
@@ -178,6 +170,7 @@
   transform: translateY(-1px);
 }
 
+/* --- Pagination --- */
 .ds-pagination {
   margin-top: 20px;
   text-align: center;
@@ -208,6 +201,7 @@
   transform: scale(1.05);
 }
 
+/* --- Pesan Status (Jika diperlukan) --- */
 .ds-status-message {
   margin-top: 20px;
   font-size: 14px;
@@ -219,19 +213,21 @@
   text-align: center;
 }
 
-/* Footer Styling (assuming Footer component uses a class like 'footer') */
+/* --- Footer --- */
 footer {
   background: #f0f0f0;
   padding: 10px;
   text-align: center;
   color: #666;
   font-size: 12px;
-  margin-top: auto; /* Push footer to the bottom */
+  margin-top: auto; /* Push footer selalu di bawah */
 }
 
+/* --- Responsive untuk layar kecil (<= 768px) --- */
 @media (max-width: 768px) {
+  /* Hilangkan margin-left karena sudah tidak ada */
   .ds-wrapper {
-    margin-left: 0; /* Remove sidebar offset on mobile */
+    margin-left: 0;
   }
 
   .ds-container {
@@ -264,11 +260,6 @@ footer {
 
   .ds-daftar-table td {
     margin: 5px 0;
-  }
-
-  .ds-status-badge {
-    display: block;
-    margin-top: 5px;
   }
 
   .ds-action-btn {
