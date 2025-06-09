@@ -14,6 +14,7 @@ const initialState = {
 
 const Dashboard = () => {
   const [formData, setFormData] = useState(initialState);
+  const [fileData, setFileData] = useState({ pdf_toefl: null, pdf_bta: null, pdf_skp: null });
   const [errors, setErrors] = useState({});
   const [statusMsg, setStatusMsg] = useState('');
 
@@ -41,20 +42,24 @@ const Dashboard = () => {
     if (!formData.sertifikatBTA) newErrors.sertifikatBTA = 'No. Sertifikat BTA wajib diisi';
     if (!formData.sertifikatSKP) newErrors.sertifikatSKP = 'No. Sertifikat SKP wajib diisi';
     if (!formData.tanggal) newErrors.tanggal = 'Tanggal wajib diisi';
+    if (!fileData.pdf_toefl) newErrors.pdf_toefl = 'File PDF TOEFL wajib diupload';
+    if (!fileData.pdf_bta) newErrors.pdf_bta = 'File PDF BTA wajib diupload';
+    if (!fileData.pdf_skp) newErrors.pdf_skp = 'File PDF SKP wajib diupload';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    setFormData({ ...formData, [e.target.name]: e.target.value });
     if (errors[e.target.name]) {
-      setErrors({
-        ...errors,
-        [e.target.name]: null,
-      });
+      setErrors({ ...errors, [e.target.name]: null });
+    }
+  };
+
+  const handleFileChange = (e) => {
+    setFileData({ ...fileData, [e.target.name]: e.target.files[0] });
+    if (errors[e.target.name]) {
+      setErrors({ ...errors, [e.target.name]: null });
     }
   };
 
@@ -65,18 +70,23 @@ const Dashboard = () => {
       setStatusMsg('Harap perbaiki error pada form.');
       return;
     }
-
     setStatusMsg('Menerbitkan sertifikat ke blockchain...');
     try {
+      const fd = new FormData();
+      Object.entries(formData).forEach(([key, val]) => fd.append(key, val));
+      fd.append('pdf_toefl', fileData.pdf_toefl);
+      fd.append('pdf_bta', fileData.pdf_bta);
+      fd.append('pdf_skp', fileData.pdf_skp);
+
       const res = await fetch('http://127.0.0.1:5000/terbitkan_sertifikat_blockchain', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: fd,
       });
       const data = await res.json();
       if (res.ok && data.transaction_hash) {
         setStatusMsg('Sukses! Sertifikat telah diterbitkan di blockchain.');
         setFormData(initialState);
+        setFileData({ pdf_toefl: null, pdf_bta: null, pdf_skp: null });
         setErrors({});
       } else {
         setStatusMsg(data.error || 'Gagal menerbitkan sertifikat. Coba lagi.');
@@ -99,6 +109,7 @@ const Dashboard = () => {
 
         <form onSubmit={handleSubmit} className="dashboard-form">
           <div className="dashboard-card">
+            {/* Text Inputs */}
             <div className="dashboard-form-group">
               <label htmlFor="nama" className="dashboard-label">
                 Nama Lengkap
@@ -180,7 +191,7 @@ const Dashboard = () => {
                   id="sertifikatBTA"
                   name="sertifikatBTA"
                   type="text"
-                  placeholder="Contoh: 1234567890"
+                  placeholder="Contoh: 0987654321"
                   value={formData.sertifikatBTA}
                   onChange={handleChange}
                   className={`dashboard-input ${errors.sertifikatBTA ? 'input-error' : ''}`}
@@ -197,7 +208,7 @@ const Dashboard = () => {
                 id="sertifikatSKP"
                 name="sertifikatSKP"
                 type="text"
-                placeholder="Contoh: 1234567890"
+                placeholder="Contoh: 1122334455"
                 value={formData.sertifikatSKP}
                 onChange={handleChange}
                 className={`dashboard-input ${errors.sertifikatSKP ? 'input-error' : ''}`}
@@ -219,6 +230,52 @@ const Dashboard = () => {
               />
               {errors.tanggal && <p className="error-text">{errors.tanggal}</p>}
             </div>
+
+            {/* File Inputs */}
+            <div className="dashboard-form-group">
+              <label htmlFor="pdf_toefl" className="dashboard-label">
+                Upload PDF TOEFL
+              </label>
+              <input
+                id="pdf_toefl"
+                name="pdf_toefl"
+                type="file"
+                accept="application/pdf"
+                onChange={handleFileChange}
+                className={`dashboard-input ${errors.pdf_toefl ? 'input-error' : ''}`}
+              />
+              {errors.pdf_toefl && <p className="error-text">{errors.pdf_toefl}</p>}
+            </div>
+
+            <div className="dashboard-form-group">
+              <label htmlFor="pdf_bta" className="dashboard-label">
+                Upload PDF BTA
+              </label>
+              <input
+                id="pdf_bta"
+                name="pdf_bta"
+                type="file"
+                accept="application/pdf"
+                onChange={handleFileChange}
+                className={`dashboard-input ${errors.pdf_bta ? 'input-error' : ''}`}
+              />
+              {errors.pdf_bta && <p className="error-text">{errors.pdf_bta}</p>}
+            </div>
+
+            <div className="dashboard-form-group">
+              <label htmlFor="pdf_skp" className="dashboard-label">
+                Upload PDF SKP
+              </label>
+              <input
+                id="pdf_skp"
+                name="pdf_skp"
+                type="file"
+                accept="application/pdf"
+                onChange={handleFileChange}
+                className={`dashboard-input ${errors.pdf_skp ? 'input-error' : ''}`}
+              />
+              {errors.pdf_skp && <p className="error-text">{errors.pdf_skp}</p>}
+            </div>
           </div>
 
           <div className="dashboard-form-action">
@@ -239,13 +296,13 @@ const Dashboard = () => {
                   : statusMsg.includes('Gagal')
                   ? 'error'
                   : 'info'
-              }`}>
+              }
+            `}>
               {statusMsg}
             </p>
           </div>
         )}
 
-        {/* Komponen Footer */}
         <div className="dashboard-footer-wrapper">
           <Footer />
         </div>

@@ -228,6 +228,7 @@ function Verifikasi() {
       if (response.ok) {
         setVerifikasiResult(data);
         setShowModal(true);
+        console.log(verifikasiResult);
       } else {
         setErrorMsg(data.error || data.message || 'Verifikasi gagal');
       }
