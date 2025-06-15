@@ -1,123 +1,263 @@
-#home-page {
-  font-family: Arial, sans-serif;
-  background: linear-gradient(to bottom right, #4a90e2, #001f4d);
+.Home-page {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  text-align: center;
+  background: linear-gradient(135deg, #262f96 0%, #4a0ec2 100%);
+  font-family: 'Segoe UI', Arial, sans-serif;
   padding: 0;
-  margin: 0;
-  position: relative;
 }
 
-.home-navbar {
-  position: absolute;
-  top: 20px;
-  left: 0;
-  right: 0;
+.Home-navbar {
+  width: 100%;
   display: flex;
-  justify-content: space-between;
-  padding: 0 20px;
+  justify-content: center;
   align-items: center;
+  padding: 38px 0 0 0;
+  z-index: 2;
 }
 
-.home-sign-in {
-  background: transparent;
-  color: white;
-  border: 1px solid white;
-  padding: 8px 15px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 14px;
+.Home-site-title {
+  color: #fff;
+  font-size: 2.2rem;
+  letter-spacing: 2.5px;
+  font-weight: 800;
+  text-shadow: 0 8px 40px #0005;
 }
 
-.home-sign-in:hover {
-  background: white;
-  color: #4a90e2;
-}
-
-.home-site-title {
-  font-size: 25px;
-  font-weight: bold;
-  margin: 0;
-  color: white;
-}
-
-.home-main-content {
+.Home-main-content {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  flex-grow: 1;
-  padding-top: 80px;
+  flex: 1 1 0;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 430px;
 }
 
-.home-title {
-  font-size: 32px;
-  color: white;
-  margin-bottom: 20px;
-}
-
-.home-input-group {
+.Home-card-glass {
+  margin: 42px 0 24px 0;
+  width: 100%;
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 20px;
+  box-shadow: 0 10px 40px #0002;
+  padding: 36px 26px 30px 26px;
+  backdrop-filter: blur(6px);
+  border: 1.5px solid rgba(255, 255, 255, 0.09);
   display: flex;
-  gap: 15px;
+  flex-direction: column;
   align-items: center;
+  position: relative;
+}
+
+.Home-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 30px;
+  letter-spacing: 1.2px;
+}
+
+.Home-form {
   width: 100%;
-  max-width: 900px;
-  justify-content: center;
-  margin-bottom: 20px;
-}
-
-.home-input-box {
-  padding: 15px;
-  font-size: 18px;
-  border-radius: 6px;
-  border: none;
-  width: 100%;
-  flex-grow: 1;
-}
-
-.home-verify-btn {
-  background-color: #28a745;
-  color: white;
-  border: none;
-  padding: 15px 20px;
-  border-radius: 6px;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-.home-verify-btn:hover {
-  background-color: #218838;
-}
-
-.home-button-group {
   display: flex;
-  justify-content: center;
-  gap: 15px;
-  margin-top: 10px;
+  flex-direction: column;
+  gap: 16px;
 }
 
-.home-select-btn,
-.home-camera-btn {
-  background-color: #007bff;
-  color: white;
+.Home-label {
+  color: #eaeaea;
+  font-size: 1.06rem;
+  font-weight: 600;
+  margin-bottom: 7px;
+  text-align: left;
+}
+
+.Home-file-input {
+  padding: 10px 6px;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 9px;
   border: none;
-  padding: 12px 20px;
-  border-radius: 6px;
+  font-size: 1rem;
+  color: #242451;
+  margin-top: 0;
+  display: none;
+}
+
+.Home-hash-input {
+  padding: 11px 13px;
+  border-radius: 9px;
+  border: 1.4px solid #ddd;
+  font-size: 1.05rem;
+  color: #292981;
+  background: rgba(255, 255, 255, 0.87);
+  font-weight: 500;
+  margin-top: 3px;
+  transition: border 0.19s;
+}
+.Home-hash-input:focus {
+  border: 1.7px solid #2965f1;
+  outline: none;
+}
+
+.Home-verify-btn,
+.Home-scan-btn,
+.Home-cam-btn {
+  border: none;
+  border-radius: 12px;
+  padding: 13px 28px;
+  font-size: 1.08rem;
+  font-weight: 700;
+  margin: 0 0 10px 0;
+  background: linear-gradient(90deg, #4a0ec2 20%, #262f96 100%);
+  color: #fff;
   cursor: pointer;
-  font-size: 16px;
+  box-shadow: 0 2px 20px #2b1d5733;
+  transition: background 0.19s, box-shadow 0.19s, transform 0.19s;
+}
+.Home-verify-btn:active,
+.Home-scan-btn:active,
+.Home-cam-btn:active {
+  transform: scale(0.98);
+  box-shadow: 0 1px 7px #2222;
+}
+.Home-cam-btn {
+  background: linear-gradient(90deg, #2965f1 10%, #00b4d8 100%);
+  margin-top: 5px;
+}
+.Home-verify-btn[disabled],
+.Home-scan-btn[disabled],
+.Home-cam-btn[disabled] {
+  opacity: 0.75;
+  cursor: not-allowed;
 }
 
-.home-select-btn:hover,
-.home-camera-btn:hover {
-  background-color: #0056b3;
+.Home-or-text {
+  color: #eee;
+  font-size: 1rem;
+  margin: 13px 0 10px 0;
+  display: block;
+  text-align: center;
 }
 
-.home-footer {
+.Home-reader {
+  width: 300px;
+  margin: 18px auto 0 auto;
+  border-radius: 16px;
+  overflow: hidden;
+  border: 2.5px solid #2965f1;
+  box-shadow: 0 4px 24px #0002;
+  background: #191970;
+  max-width: 340px;
+  display: none;
+}
+.Home-reader.active {
+  display: block;
+}
+
+.Home-loading {
+  color: #2965f1;
+  font-weight: 700;
+  font-size: 1.12rem;
+  margin: 19px auto 0 auto;
+}
+
+.Home-alert-result {
+  margin-top: 30px;
+  background: #fff;
+  border-radius: 13px;
+  box-shadow: 0 6px 24px #0002;
+  color: #222;
+  padding: 26px 14px 18px 14px;
+  font-size: 1.08rem;
+  font-weight: 600;
+  border-left: 7px solid #28a745;
+  text-align: left;
+  position: relative;
+  word-break: break-all;
+  width: 100%;
+}
+.Home-alert-result.invalid {
+  border-left: 7px solid #dc3545;
+}
+.Home-result-message {
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+  font-size: 1.13rem;
+  margin-bottom: 12px;
+  color: #18181a;
+}
+.Home-result-icon {
+  font-size: 2.1rem;
+  vertical-align: middle;
+  margin-right: 10px;
+  line-height: 1;
+}
+.Home-block-section-title {
+  margin-top: 18px;
+  font-size: 1.08rem;
+  color: #2c3e50;
+  font-weight: 600;
+  margin-bottom: 5px;
+  letter-spacing: 0.7px;
+}
+.Home-block-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  margin-bottom: 4px;
+}
+.Home-block-table th,
+.Home-block-table td {
+  padding: 7px 9px;
+  text-align: left;
+  font-size: 0.98rem;
+  border-bottom: 1px solid #f2f2f2;
+  color: #34345b;
+}
+.Home-block-table th {
+  background: #f6fafe;
+  font-weight: 600;
+  color: #2965f1;
+}
+.Home-alert-result pre {
+  background: #282846;
+  color: #fff;
+  border-radius: 8px;
+  padding: 13px 8px;
+  font-size: 0.98rem;
+  margin-top: 12px;
+  overflow-x: auto;
+  white-space: pre-wrap;
+}
+
+.Home-footer {
   text-align: center;
   font-size: 14px;
-  padding: 20px;
-  opacity: 0.9;
+  padding: 28px 0 14px 0;
+  color: #eaeaea;
+  background: none;
+  font-weight: 500;
+  letter-spacing: 0.7px;
+}
+
+@media (max-width: 600px) {
+  .Home-main-content {
+    max-width: 100vw;
+  }
+  .Home-card-glass {
+    padding: 19px 8vw 16px 8vw;
+    margin: 25px 0 12px 0;
+  }
+  .Home-navbar {
+    padding: 21px 0 0 0;
+  }
+  .Home-reader {
+    max-width: 99vw;
+    min-width: 160px;
+  }
+  .Home-title {
+    font-size: 1.19rem;
+  }
 }
