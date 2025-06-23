@@ -135,7 +135,7 @@ function Verifikasi() {
       return;
     }
     try {
-      const response = await fetch('http://localhost:5000/verifikasi/hash', {
+      const response = await fetch('http://localhost:5000/api/verifikasi/hash', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ data_hash: hashValue.trim() }),
@@ -169,7 +169,7 @@ function Verifikasi() {
     const dataToSend = {};
     requiredFields.forEach((field) => (dataToSend[field] = inputValue[field].trim()));
     try {
-      const response = await fetch('http://localhost:5000/admin/verifikasi', {
+      const response = await fetch('http://localhost:5000/api/admin/verifikasi', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(dataToSend),

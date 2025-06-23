@@ -1,9 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
-import { FaCamera, FaTimes, FaCheckCircle, FaExclamationTriangle, FaFilePdf } from 'react-icons/fa';
-import './Home.css'; // Pastikan file CSS ini diimpor
+import {
+  FaCamera,
+  FaTimes,
+  FaCheckCircle,
+  FaExclamationTriangle,
+  FaFileUpload,
+  FaFilePdf,
+} from 'react-icons/fa';
+import './Home.css';
 
-// Daftar dokumen untuk ditampilkan di modal
 const docList = { key: 'cidSertifikatToefl', label: 'Sertifikat TOEFL' };
 
 function Home() {
@@ -11,14 +17,19 @@ function Home() {
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
-  const [showModal, setShowModal] = useState(false); // State untuk modal
-  const html5QrcodeScannerRef = useRef(null);
+  const [showModal, setShowModal] = useState(false);
+  // State untuk menyimpan data preview dari PDF yang di-upload
+  const [pdfPreviewData, setPdfPreviewData] = useState(null);
 
-  // Fungsi verifikasi utama yang akan dipanggil
-  const handleVerification = async (hashToVerify) => {
+  const html5QrcodeScannerRef = useRef(null);
+  // Ref untuk input file yang tersembunyi, agar bisa di-trigger oleh tombol
+  const fileInputRef = useRef(null);
+
+  // Fungsi verifikasi utama (via HASH)
+  const handleVerifyByHash = async (hashToVerify) => {
     if (!hashToVerify) {
       setResult({ status: 'invalid', message: 'Hash tidak boleh kosong.' });
-      setShowModal(true); // Tampilkan modal error
+      setShowModal(true);
       return;
     }
 
@@ -26,7 +37,7 @@ function Home() {
     setResult(null);
 
     try {
-      const response = await fetch(`http://localhost:5000/verifikasi/hash`, {
+      const response = await fetch(`http://localhost:5000/api/verifikasi/hash`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ data_hash: hashToVerify.trim() }),
@@ -37,14 +48,88 @@ function Home() {
       setResult({ status: 'invalid', message: 'Gagal terhubung ke server. ' + error.message });
     } finally {
       setLoading(false);
-      setShowModal(true); // Tampilkan modal setelah proses selesai
+      setShowModal(true);
     }
   };
 
+  // Fungsi untuk verifikasi final dari data preview PDF
+  const handleVerifyFromPreview = async () => {
+    if (!pdfPreviewData) return;
+
+    setLoading(true);
+    setResult(null);
+
+    try {
+      // Panggil endpoint '/api/verifikasi' dengan seluruh metadata dari preview
+      const response = await fetch(`http://localhost:5000/api/verifikasi`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(pdfPreviewData),
+      });
+      const data = await response.json();
+      setResult(data); // Hasil final verifikasi
+    } catch (error) {
+      setResult({ status: 'invalid', message: 'Gagal verifikasi data. ' + error.message });
+    } finally {
+      setLoading(false);
+      setShowModal(true); // Tampilkan modal dengan hasil akhir
+      setPdfPreviewData(null); // Bersihkan preview setelah verifikasi
+    }
+  };
+
+  // Fungsi untuk upload dan ekstrak PDF
+  const handlePdfUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (file.type !== 'application/pdf') {
+      setResult({ status: 'invalid', message: 'Format file tidak valid. Harap unggah file PDF.' });
+      setShowModal(true);
+      return;
+    }
+
+    setLoading(true);
+    setPdfPreviewData(null);
+    setResult(null);
+
+    const formData = new FormData();
+    formData.append('pdfFile', file);
+
+    try {
+      // Panggil endpoint '/api/extract-pdf' untuk mendapatkan preview data
+      const response = await fetch(`http://localhost:5000/api/extract-pdf`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Gagal mengekstrak data dari PDF.');
+      }
+
+      setPdfPreviewData(data); // Simpan data ke state preview
+    } catch (error) {
+      setResult({ status: 'invalid', message: error.message });
+      setShowModal(true);
+    } finally {
+      setLoading(false);
+      // Reset input file agar bisa upload file yang sama lagi
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+    }
+  };
+
+  // Fungsi untuk trigger klik pada input file
+  const handlePdfButtonClick = () => {
+    fileInputRef.current.click();
+  };
+
   // Handler untuk form input manual
-  const handleVerifyByInput = (e) => {
+  const handleVerifyByInputForm = (e) => {
     e.preventDefault();
-    handleVerification(inputValue);
+    handleVerifyByHash(inputValue);
   };
 
   const closeModal = () => {
@@ -62,12 +147,30 @@ function Home() {
       const qrSuccess = (decodedText) => {
         setIsScanning(false);
         try {
-          const qrData = JSON.parse(decodedText);
-          if (qrData.hashMetadata) {
-            setInputValue(qrData.hashMetadata);
-            handleVerification(qrData.hashMetadata);
+          // Asumsi QR code berisi URL verifikasi atau JSON dengan hash
+          // Kita coba handle keduanya
+          let hashToVerify = '';
+          try {
+            // Coba parsing sebagai JSON
+            const qrData = JSON.parse(decodedText);
+            if (qrData.hashMetadata) {
+              hashToVerify = qrData.hashMetadata;
+            } else {
+              throw new Error(); // Lanjut ke catch
+            }
+          } catch (e) {
+            console.log(e);
+            // Jika bukan JSON atau tidak ada hashMetadata, anggap sebagai URL atau hash biasa
+            // Contoh: https://domain.com/verify/hash-nya-disini
+            const urlParts = decodedText.split('/');
+            hashToVerify = urlParts[urlParts.length - 1]; // Ambil bagian terakhir
+          }
+
+          if (hashToVerify) {
+            setInputValue(hashToVerify);
+            handleVerifyByHash(hashToVerify);
           } else {
-            throw new Error('Format QR code tidak valid atau tidak mengandung hashMetadata.');
+            throw new Error('Format QR code tidak valid.');
           }
         } catch (e) {
           setResult({ status: 'invalid', message: e.message || 'Gagal memproses QR code.' });
@@ -92,6 +195,14 @@ function Home() {
     }
   }, [isScanning]);
 
+  // Handler untuk membatalkan preview PDF
+  const cancelPdfPreview = () => {
+    setPdfPreviewData(null);
+  };
+
+  // Kondisi disable untuk form utama
+  const isFormDisabled = loading || isScanning || pdfPreviewData;
+
   return (
     <div className="b-verify">
       <nav className="b-verify__navbar">
@@ -106,44 +217,99 @@ function Home() {
         <div className="b-verify__container">
           <h1 className="b-verify__title">Verify Certificate</h1>
           <p className="b-verify__subtitle">
-            Verify Your Certificate With QrCode Or Digital Signature
+            Verify Your Certificate With QrCode, PDF, Or Digital Signature
           </p>
 
-          <form className="b-verify__input-group" onSubmit={handleVerifyByInput}>
-            <input
-              type="text"
-              className="b-verify__input"
-              placeholder="Tanda tangan...."
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              disabled={loading || isScanning}
-            />
-            <button type="submit" className="b-verify__button" disabled={loading || isScanning}>
-              Verify
-            </button>
-          </form>
+          {/* HANYA TAMPILKAN JIKA TIDAK ADA PREVIEW PDF */}
+          {!pdfPreviewData && (
+            <>
+              <form className="b-verify__input-group" onSubmit={handleVerifyByInputForm}>
+                <input
+                  type="text"
+                  className="b-verify__input"
+                  placeholder="Masukkan tanda tangan digital (hash)..."
+                  value={inputValue}
+                  onChange={(e) => setInputValue(e.target.value)}
+                  disabled={isFormDisabled}
+                />
+                <button type="submit" className="b-verify__button" disabled={isFormDisabled}>
+                  Verify
+                </button>
+              </form>
 
-          <button
-            className="b-verify__button b-verify__button--primary"
-            onClick={() => setIsScanning((prev) => !prev)}
-            disabled={loading}>
-            <FaCamera style={{ marginRight: '8px' }} />
-            {isScanning ? 'Stop Scan' : 'Scan'}
-          </button>
+              <div className="b-verify__actions">
+                <button
+                  className="b-verify__button b-verify__button--primary"
+                  onClick={() => setIsScanning((prev) => !prev)}
+                  disabled={isFormDisabled}>
+                  <FaCamera style={{ marginRight: '8px' }} />
+                  {isScanning ? 'Stop Scan' : 'Scan QR Code'}
+                </button>
+                {/* --- TOMBOL BARU UNTUK UPLOAD PDF --- */}
+                <button
+                  className="b-verify__button b-verify__button--secondary"
+                  onClick={handlePdfButtonClick}
+                  disabled={isFormDisabled}>
+                  <FaFileUpload style={{ marginRight: '8px' }} />
+                  Verify with PDF
+                </button>
+                {/* Input file tersembunyi */}
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handlePdfUpload}
+                  style={{ display: 'none' }}
+                  accept=".pdf"
+                />
+              </div>
 
-          {isScanning && <div id="reader-container" className="b-verify__reader" />}
+              {isScanning && <div id="reader-container" className="b-verify__reader" />}
+            </>
+          )}
+
           {loading && <div className="b-verify__loading-text">Verifying...</div>}
+
+          {/* --- KARTU PREVIEW BARU --- */}
+          {pdfPreviewData && !loading && (
+            <div className="b-verify__preview-card">
+              <div className="b-verify__preview-header">
+                <FaFilePdf />
+                <h4>Preview Data dari PDF</h4>
+              </div>
+              <div className="b-verify__data-table">
+                {Object.entries(pdfPreviewData).map(([key, value]) => (
+                  <div className="b-verify__data-row" key={key}>
+                    <span className="b-verify__data-label">
+                      {key.charAt(0).toUpperCase() + key.slice(1)}:
+                    </span>
+                    <span className="b-verify__data-value">{value}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="b-verify__preview-actions">
+                <button
+                  className="b-verify__button b-verify__button--cancel"
+                  onClick={cancelPdfPreview}>
+                  Batal
+                </button>
+                <button
+                  className="b-verify__button b-verify__button--primary"
+                  onClick={handleVerifyFromPreview}>
+                  Verify Now
+                </button>
+              </div>
+            </div>
+          )}
         </div>
       </main>
 
-      {/* HASIL VERIFIKASI SEKARANG DALAM BENTUK MODAL */}
+      {/* Modal Hasil Verifikasi */}
       {showModal && result && (
         <div className="b-verify__modal-overlay" onClick={closeModal}>
           <div className="b-verify__modal" onClick={(e) => e.stopPropagation()}>
             <button className="b-verify__modal-close" onClick={closeModal}>
               <FaTimes />
             </button>
-
             <div className="b-verify__modal-header">
               {result.status === 'valid' ? (
                 <FaCheckCircle className="b-verify__result-icon b-verify__result-icon--valid" />
@@ -152,7 +318,6 @@ function Home() {
               )}
               <h3 className={`b-verify__modal-title status--${result.status}`}>{result.message}</h3>
             </div>
-
             {result.status === 'valid' && result.data_sertifikat && (
               <div className="b-verify__modal-content">
                 <h4>Data Sertifikat Terverifikasi</h4>

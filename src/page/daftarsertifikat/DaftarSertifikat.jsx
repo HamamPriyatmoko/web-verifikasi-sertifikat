@@ -13,7 +13,7 @@ const DaftarSertifikat = () => {
 
   // Fetch data sertifikat dari API
   useEffect(() => {
-    fetch('http://127.0.0.1:5000/sertifikat')
+    fetch('http://127.0.0.1:5000/api/sertifikat')
       .then((res) => res.json())
       .then((data) => {
         setSertifikatData(data.sertifikat || []);
@@ -33,7 +33,7 @@ const DaftarSertifikat = () => {
           (item.terbit && item.terbit.toLowerCase().includes(term.toLowerCase())),
       ),
     );
-    setCurrentPage(1); // reset ke halaman 1 saat pencarian berubah
+    setCurrentPage(1);
   };
 
   // Pagination
@@ -78,7 +78,7 @@ const DaftarSertifikat = () => {
                 value={itemsPerPage}
                 onChange={(e) => {
                   setItemsPerPage(Number(e.target.value));
-                  setCurrentPage(1); // reset ke halaman 1 saat itemsPerPage berubah
+                  setCurrentPage(1);
                 }}>
                 <option value={5}>Showing 5</option>
                 <option value={10}>Showing 10</option>

@@ -79,7 +79,7 @@ const Dashboard = () => {
       Object.entries(formData).forEach(([k, v]) => fd.append(k, v));
       Object.entries(fileData).forEach(([k, f]) => fd.append(k, f));
 
-      const uploadPromise = fetch('http://127.0.0.1:5000/sertifikat', {
+      const uploadPromise = fetch('http://127.0.0.1:5000/api/sertifikat', {
         method: 'POST',
         body: fd,
       }).then(async (res) => {
