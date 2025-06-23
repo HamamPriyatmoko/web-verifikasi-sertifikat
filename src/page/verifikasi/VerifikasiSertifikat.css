@@ -1,30 +1,16 @@
-/* ------------------------------
-   Bagian 1: Perlebar card saja
-   ------------------------------ */
-
-/* Temukan aturan .verifikasi-content (sekitar baris 15–25) 
-   lalu ubah menjadi seperti di bawah. */
-
 .verifikasi-content {
   width: 100%;
   /* Naikkan max-width menjadi 1200px (atau bebas mau dilepas) */
-  max-width: 1200px;  
+  max-width: 1200px;
   background: #ffffff;
   border-radius: 12px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
   padding: 30px;
-  margin: 0;      /* Hilangkan margin bawah */
+  margin: 0; /* Hilangkan margin bawah */
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
 }
-
-/* Jika Anda benar‐benar ingin agar card mengambil 100% lebar dan tidak 
-   dibatasi sama sekali, cukup hilangkan baris max-width di atas. */
-
-/* ----------------------------------------------------------
-   Bagian lain dari VerifikasiSertifikat.css (tidak berubah)
-   ---------------------------------------------------------- */
 
 /* 1. Container Utama */
 .verifikasi-container {
@@ -301,7 +287,7 @@
   border-radius: 12px;
   padding: 20px;
   width: 90%;
-  max-width: 600px;
+  max-width: 1000px;
   max-height: 80vh;
   overflow-y: auto;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
@@ -352,6 +338,30 @@
 
 .verifikasi-modal-close-btn:hover {
   background: #c82333;
+}
+
+.verifikasi-download-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin: 15px 0;
+}
+
+.verifikasi-download-btn {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.verifikasi-download-btn:hover {
+  background: #218838;
 }
 
 /* 14. RESPONSIVE (≤768px) */
