@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
-import { FaCamera, FaTimes } from 'react-icons/fa';
+import { FaCamera, FaTimes, FaFileUpload } from 'react-icons/fa';
 import './VerifikasiSertifikat.css';
 import VerifyButton from '../../components/ButtonVerify/ButtonVerify';
 
@@ -30,19 +30,21 @@ function Verifikasi() {
   const [showModal, setShowModal] = useState(false);
   const [availableCameras, setAvailableCameras] = useState([]);
   const [chosenCameraId, setChosenCameraId] = useState('');
+
+  const [pdfPreviewData, setPdfPreviewData] = useState(null);
+
   const html5QrcodeScannerRef = useRef(null);
+  const fileInputRef = useRef(null);
 
   const stopScanner = () => {
-    if (html5QrcodeScannerRef.current) {
+    if (html5QrcodeScannerRef.current && html5QrcodeScannerRef.current.isScanning) {
       html5QrcodeScannerRef.current
         .stop()
         .then(() => {
-          html5QrcodeScannerRef.current.clear();
-          html5QrcodeScannerRef.current = null;
           setScanning(false);
         })
         .catch((err) => {
-          setErrorMsg('Gagal menghentikan scan: ' + err);
+          console.error('Gagal menghentikan scan: ', err);
           setScanning(false);
         });
     } else {
@@ -51,57 +53,77 @@ function Verifikasi() {
   };
 
   useEffect(() => {
-    if (!scanning) return;
-    setErrorMsg('');
-    navigator.mediaDevices
-      .getUserMedia({ video: true })
-      .then((stream) => {
-        stream.getTracks().forEach((track) => track.stop());
-        Html5Qrcode.getCameras()
-          .then((devices) => {
-            if (devices && devices.length) {
-              setAvailableCameras(devices);
-              const backCamera = devices.find((d) => /back|rear|environment/i.test(d.label));
-              const deviceId = backCamera ? backCamera.id : devices[0].id;
-              setChosenCameraId(deviceId);
-              startHtml5Qrcode(deviceId);
-            } else {
-              setErrorMsg('Tidak ada kamera terdeteksi.');
-              setScanning(false);
-            }
-          })
-          .catch((err) => {
-            setErrorMsg('Gagal mengambil daftar kamera: ' + err);
+    if (scanning) {
+      setErrorMsg('');
+      Html5Qrcode.getCameras()
+        .then((devices) => {
+          if (devices && devices.length) {
+            setAvailableCameras(devices);
+            const backCamera = devices.find((d) => /back|rear|environment/i.test(d.label));
+            const deviceId = backCamera ? backCamera.id : devices[0].id;
+            setChosenCameraId(deviceId);
+            startHtml5Qrcode(deviceId);
+          } else {
+            setErrorMsg('Tidak ada kamera terdeteksi.');
             setScanning(false);
-          });
-      })
-      .catch((err) => {
-        console.log(err);
-        setErrorMsg('Izin kamera ditolak atau tidak tersedia.');
-        setScanning(false);
-      });
-    return () => stopScanner();
-  }, [scanning]);
+          }
+        })
+        .catch((err) => {
+          console.log(err);
+          setErrorMsg(
+            'Gagal mendapatkan izin atau daftar kamera. Pastikan Anda mengizinkan akses kamera di browser.',
+          );
+          setScanning(false);
+        });
+    }
 
-  const startHtml5Qrcode = (deviceId) => {
-    const config = { fps: 15, qrbox: { width: 300, height: 300 } };
-    const qrCodeSuccessCallback = (decodedText) => {
-      try {
-        const json = JSON.parse(decodedText);
-        setInputValue({ ...defaultInput, ...json });
-        setErrorMsg('');
-      } catch (e) {
-        console.log(e);
-        setErrorMsg('QR Code tidak valid atau bukan format JSON.');
-        setInputValue(defaultInput);
-      } finally {
+    return () => {
+      if (html5QrcodeScannerRef.current && html5QrcodeScannerRef.current.isScanning) {
         stopScanner();
       }
     };
-    const qrCodeErrorCallback = (errorMessage) => console.log('QR decode error:', errorMessage);
+  }, [scanning]);
+
+  // --- FUNGSI INI YANG DIUBAH ---
+  const startHtml5Qrcode = (deviceId) => {
+    const config = { fps: 15, qrbox: { width: 300, height: 300 } };
+
+    const qrCodeSuccessCallback = (decodedText) => {
+      stopScanner(); // Hentikan scanner segera setelah berhasil
+
+      // Cek apakah hasil scan adalah URL
+      if (decodedText.startsWith('http')) {
+        try {
+          // Ambil bagian terakhir dari URL sebagai hash
+          const urlParts = decodedText.split('/');
+          const hash = urlParts[urlParts.length - 1];
+
+          if (hash) {
+            setHashValue(hash); // Set nilai hash ke input field
+            handleVerifyByHash(hash); // Langsung verifikasi menggunakan hash
+          } else {
+            throw new Error('URL tidak mengandung hash yang valid.');
+          }
+        } catch (e) {
+          setErrorMsg(e.message || 'Gagal memproses URL dari QR Code.');
+        }
+      } else {
+        // Jika bukan URL, asumsikan itu adalah JSON
+        try {
+          const json = JSON.parse(decodedText);
+          setInputValue({ ...defaultInput, ...json }); // Mengisi form preview dari QR
+          setErrorMsg('');
+        } catch (e) {
+          console.error(e);
+          setErrorMsg('QR Code tidak valid. Isinya bukan URL atau JSON.');
+          setInputValue(defaultInput);
+        }
+      }
+    };
+
     html5QrcodeScannerRef.current = new Html5Qrcode('reader');
     html5QrcodeScannerRef.current
-      .start(deviceId, config, qrCodeSuccessCallback, qrCodeErrorCallback)
+      .start({ deviceId: { exact: deviceId } }, config, qrCodeSuccessCallback)
       .catch((err) => {
         setErrorMsg('Gagal memulai scanner: ' + err);
         setScanning(false);
@@ -111,25 +133,19 @@ function Verifikasi() {
   const handleCameraChange = (e) => {
     const selectedId = e.target.value;
     setChosenCameraId(selectedId);
-    if (html5QrcodeScannerRef.current) {
-      html5QrcodeScannerRef.current
-        .stop()
-        .then(() => {
-          html5QrcodeScannerRef.current.clear();
-          html5QrcodeScannerRef.current = null;
-          startHtml5Qrcode(selectedId);
-        })
-        .catch((err) => setErrorMsg('Gagal ganti kamera: ' + err));
-    } else {
-      startHtml5Qrcode(selectedId);
-    }
+    stopScanner();
+    setTimeout(() => startHtml5Qrcode(selectedId), 100);
   };
 
-  const handleVerifyByHash = async () => {
+  const handleVerifyByHash = async (hashToVerify) => {
+    // Jika hash tidak di-pass sebagai argumen, ambil dari state
+    const hash = hashToVerify || hashValue;
+
     setLoading(true);
     setErrorMsg('');
     setVerifikasiResult(null);
-    if (!hashValue.trim()) {
+
+    if (!hash.trim()) {
       setErrorMsg('Silakan masukkan hash sertifikat!');
       setLoading(false);
       return;
@@ -138,7 +154,7 @@ function Verifikasi() {
       const response = await fetch('http://localhost:5000/api/verifikasi/hash', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ data_hash: hashValue.trim() }),
+        body: JSON.stringify({ data_hash: hash.trim() }),
       });
       const data = await response.json();
       if (response.ok) {
@@ -154,20 +170,23 @@ function Verifikasi() {
     }
   };
 
-  const handleVerifyByQR = async () => {
+  const handleVerifyByMetadata = async (metadata) => {
     setLoading(true);
     setErrorMsg('');
     setVerifikasiResult(null);
+
     const requiredFields = ['nim', 'nama', 'universitas', 'jurusan', 'tanggalTerbit'];
     for (let field of requiredFields) {
-      if (!inputValue[field] || inputValue[field].trim() === '') {
-        setErrorMsg(`Field ${field} dari QR code wajib ada!`);
+      if (!metadata[field] || String(metadata[field]).trim() === '') {
+        setErrorMsg(`Field '${field}' dari data wajib ada!`);
         setLoading(false);
         return;
       }
     }
+
     const dataToSend = {};
-    requiredFields.forEach((field) => (dataToSend[field] = inputValue[field].trim()));
+    requiredFields.forEach((field) => (dataToSend[field] = String(metadata[field]).trim()));
+
     try {
       const response = await fetch('http://localhost:5000/api/admin/verifikasi', {
         method: 'POST',
@@ -185,6 +204,47 @@ function Verifikasi() {
       setErrorMsg('Terjadi kesalahan saat verifikasi: ' + error.message);
     } finally {
       setLoading(false);
+      setPdfPreviewData(null);
+      setInputValue(defaultInput);
+    }
+  };
+
+  const handlePdfUpload = async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    if (file.type !== 'application/pdf') {
+      setErrorMsg('Format file tidak valid. Harap unggah file PDF.');
+      return;
+    }
+
+    setLoading(true);
+    setErrorMsg('');
+    setPdfPreviewData(null);
+
+    const formData = new FormData();
+    formData.append('pdfFile', file);
+
+    try {
+      const response = await fetch('http://localhost:5000/api/extract-pdf', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Gagal mengekstrak data dari PDF.');
+      }
+
+      setPdfPreviewData(data);
+    } catch (error) {
+      setErrorMsg(error.message);
+    } finally {
+      setLoading(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   };
 
@@ -201,6 +261,9 @@ function Verifikasi() {
     setVerifikasiResult(null);
   };
 
+  const isActionDisabled = loading || scanning;
+
+  // Render function (JSX)
   return (
     <div className="verifikasi-container">
       <div className="verifikasi-main-content">
@@ -212,24 +275,25 @@ function Verifikasi() {
             <input
               type="text"
               className="verifikasi-input-box"
-              placeholder="Masukkan Hash Sertifikat"
+              placeholder="Masukkan tanda tangan digital (hash)..."
               value={hashValue}
               onChange={(e) => setHashValue(e.target.value)}
+              disabled={isActionDisabled}
             />
             <VerifyButton
               text="Verifikasi"
-              onClick={handleVerifyByHash}
-              disabled={loading || !hashValue.trim()}
-              loading={loading}
+              onClick={() => handleVerifyByHash()}
+              disabled={isActionDisabled || !hashValue.trim()}
+              loading={loading && hashValue.trim() !== ''}
             />
           </div>
 
-          {/* Tombol Scan QR */}
+          {/* Grup Tombol Aksi Utama */}
           <div className="verifikasi-button-group">
             <button
               className="verifikasi-camera-btn"
               onClick={() => setScanning((prev) => !prev)}
-              disabled={loading}>
+              disabled={isActionDisabled}>
               {scanning ? (
                 <>
                   <FaTimes size={24} /> Tutup Scan
@@ -240,14 +304,29 @@ function Verifikasi() {
                 </>
               )}
             </button>
+            <button
+              className="verifikasi-pdf-btn"
+              onClick={() => fileInputRef.current.click()}
+              disabled={isActionDisabled}>
+              <FaFileUpload size={24} /> Verifikasi via PDF
+            </button>
+            <input
+              type="file"
+              ref={fileInputRef}
+              style={{ display: 'none' }}
+              onChange={handlePdfUpload}
+              accept=".pdf"
+            />
           </div>
 
+          {/* (Sisa dari JSX tidak berubah dan tetap sama seperti sebelumnya) */}
+          {/* ... */}
           {/* Scanner UI */}
           {scanning && (
-            <>
+            <div className="verifikasi-scanner-wrapper">
               {availableCameras.length > 1 && (
                 <div style={{ textAlign: 'center', marginBottom: 10 }}>
-                  <label htmlFor="camera-select" style={{ marginRight: 8 }}>
+                  <label htmlFor="camera-select" style={{ marginRight: 8, color: '#333' }}>
                     Pilihan Kamera:
                   </label>
                   <select id="camera-select" value={chosenCameraId} onChange={handleCameraChange}>
@@ -265,13 +344,13 @@ function Verifikasi() {
                   <span className="scanner-line" />
                 </div>
               </div>
-            </>
+            </div>
           )}
 
-          {/* Preview Data QR */}
+          {/* Preview Data dari QR */}
           {Object.values(inputValue).some((val) => val) && (
             <div className="verifikasi-preview">
-              <h4>Data Sertifikat dari QR:</h4>
+              <h4>Data Sertifikat dari QR Code:</h4>
               <div className="verifikasi-data-table">
                 <div className="verifikasi-data-row">
                   <span className="verifikasi-data-label">NIM:</span>
@@ -281,37 +360,61 @@ function Verifikasi() {
                   <span className="verifikasi-data-label">Nama:</span>
                   <span className="verifikasi-data-value">{inputValue.nama}</span>
                 </div>
-                <div className="verifikasi-data-row">
-                  <span className="verifikasi-data-label">Universitas:</span>
-                  <span className="verifikasi-data-value">{inputValue.universitas}</span>
-                </div>
-                <div className="verifikasi-data-row">
-                  <span className="verifikasi-data-label">Jurusan:</span>
-                  <span className="verifikasi-data-value">{inputValue.jurusan}</span>
-                </div>
-                <div className="verifikasi-data-row">
-                  <span className="verifikasi-data-label">Tanggal Terbit:</span>
-                  <span className="verifikasi-data-value">{inputValue.tanggalTerbit}</span>
-                </div>
               </div>
-              <VerifyButton
-                text="Verifikasi by QR"
-                onClick={handleVerifyByQR}
-                disabled={loading}
-                loading={loading}
-              />
+              <div className="verifikasi-preview-actions">
+                <button
+                  className="verifikasi-cancel-btn"
+                  onClick={() => setInputValue(defaultInput)}>
+                  Batal
+                </button>
+                <VerifyButton
+                  text="Verifikasi by QR"
+                  onClick={() => handleVerifyByMetadata(inputValue)}
+                  disabled={loading}
+                  loading={loading && Object.values(inputValue).some((v) => v)}
+                />
+              </div>
             </div>
           )}
 
-          {/* Hasil Verifikasi / Error */}
+          {/* Preview Data dari PDF */}
+          {pdfPreviewData && (
+            <div className="verifikasi-preview">
+              <h4>Data Sertifikat dari PDF:</h4>
+              <div className="verifikasi-data-table">
+                {Object.entries(pdfPreviewData).map(([key, value]) => (
+                  <div className="verifikasi-data-row" key={key}>
+                    <span className="verifikasi-data-label">
+                      {key.charAt(0).toUpperCase() + key.slice(1)}:
+                    </span>
+                    <span className="verifikasi-data-value">{value}</span>
+                  </div>
+                ))}
+              </div>
+              <div className="verifikasi-preview-actions">
+                <button className="verifikasi-cancel-btn" onClick={() => setPdfPreviewData(null)}>
+                  Batal
+                </button>
+                <VerifyButton
+                  text="Verifikasi by PDF"
+                  onClick={() => handleVerifyByMetadata(pdfPreviewData)}
+                  disabled={loading}
+                  loading={loading && !!pdfPreviewData}
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Pesan Error / Status Awal */}
           <div className="verifikasi-result">
             {errorMsg && <div className="verifikasi-error">{errorMsg}</div>}
             {!errorMsg &&
               !verifikasiResult &&
               !scanning &&
+              !pdfPreviewData &&
               !Object.values(inputValue).some((val) => val) && (
                 <div className="verifikasi-empty">
-                  Silakan scan QR code atau masukkan hash untuk verifikasi.
+                  Silakan scan QR code, unggah PDF, atau masukkan hash untuk verifikasi.
                 </div>
               )}
           </div>
@@ -323,7 +426,6 @@ function Verifikasi() {
                 <h3>✅ Sertifikat Ditemukan dan Terverifikasi di Blockchain</h3>
                 <div className="verifikasi-modal-content">
                   <div className="verifikasi-data-table">
-                    {/* Data Sertifikat */}
                     {(() => {
                       const s = verifikasiResult.data_sertifikat;
                       return (
@@ -355,7 +457,6 @@ function Verifikasi() {
                         </>
                       );
                     })()}
-                    {/* Info Blok */}
                     {verifikasiResult.info_blok &&
                       (() => {
                         const b = verifikasiResult.info_blok;
@@ -377,7 +478,7 @@ function Verifikasi() {
                             <div className="verifikasi-data-row">
                               <span className="verifikasi-data-label">Timestamp:</span>
                               <span className="verifikasi-data-value">
-                                {new Date(b.timestamp * 1000).toLocaleString()}
+                                {new Date(b.timestamp * 1000).toLocaleString('id-ID')}
                               </span>
                             </div>
                             <div className="verifikasi-data-row">

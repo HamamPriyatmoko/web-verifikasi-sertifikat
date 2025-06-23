@@ -1,43 +1,31 @@
-.verifikasi-content {
-  width: 100%;
-  /* Naikkan max-width menjadi 1200px (atau bebas mau dilepas) */
-  max-width: 1200px;
-  background: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  padding: 30px;
-  margin: 0; /* Hilangkan margin bawah */
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-}
-
 /* 1. Container Utama */
 .verifikasi-container {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
-  background: linear-gradient(180deg, #e8f0fe 0%, #f2f6fb 100%);
-  padding: 20px 40px 10px 40px;
+  background: #f4f7f6;
+  padding: 20px 40px;
   box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
+    sans-serif;
 }
 
-/* 2. Main Content (Card) Menempel Kiri */
+/* 2. Main Content Wrapper */
 .verifikasi-main-content {
   display: flex;
-  justify-content: flex-start;
+  justify-content: center;
   align-items: flex-start;
   flex: 1;
   width: 100%;
 }
 
-/* 3. Card (diubah di bagian atas) */
+/* 3. Card Konten Utama */
 .verifikasi-content {
   width: 100%;
-  max-width: 1200px; /* dinaikkan dari 900px */
+  max-width: 900px;
   background: #ffffff;
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
   padding: 30px;
   margin: 0;
   box-sizing: border-box;
@@ -49,10 +37,11 @@
 .verifikasi-title {
   font-size: 24px;
   color: #333;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
   font-weight: 600;
   text-align: center;
   text-transform: uppercase;
+  letter-spacing: 1px;
 }
 
 /* 5. Input Hash & Tombol Verifikasi */
@@ -61,21 +50,20 @@
   gap: 10px;
   align-items: center;
   width: 100%;
-  justify-content: center;
   margin-bottom: 20px;
 }
 
 .verifikasi-input-box {
-  padding: 12px;
+  padding: 12px 15px;
   font-size: 14px;
   border-radius: 6px;
   border: 1px solid #dfe1e5;
   width: 100%;
   flex-grow: 1;
-  background-color: #f5f5f5;
+  background-color: #fafbfc;
   color: #333;
   outline: none;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
 }
 
 .verifikasi-input-box::placeholder {
@@ -84,44 +72,21 @@
 
 .verifikasi-input-box:focus {
   border-color: #007bff;
-  box-shadow: 0 0 5px rgba(0, 123, 255, 0.3);
+  background-color: #fff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.2);
 }
 
-.verifikasi-verify-btn {
-  background: rgba(19, 223, 43, 0.921);
-  color: #333;
-  border: none;
-  padding: 12px 20px;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 100px;
-}
-
-.verifikasi-verify-btn:disabled {
-  background: #e0e0e0;
-  cursor: not-allowed;
-}
-
-.verifikasi-verify-btn:hover:not(:disabled) {
-  background: #b0b0b0;
-}
-
-/* 6. Tombol Scan QR */
+/* 6. Grup Tombol Aksi */
 .verifikasi-button-group {
   display: flex;
   justify-content: center;
   gap: 15px;
-  margin: 20px 0;
+  margin: 10px 0 20px 0;
+  flex-wrap: wrap;
 }
 
-.verifikasi-camera-btn {
-  background: #007bff;
+.verifikasi-camera-btn,
+.verifikasi-pdf-btn {
   color: white;
   border: none;
   padding: 12px 20px;
@@ -133,30 +98,47 @@
   align-items: center;
   gap: 8px;
   transition: all 0.3s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.verifikasi-camera-btn {
+  background: #007bff;
+}
+
+.verifikasi-pdf-btn {
+  background: #17a2b8;
 }
 
 .verifikasi-camera-btn:hover:not(:disabled) {
   background: #0056b3;
 }
+.verifikasi-pdf-btn:hover:not(:disabled) {
+  background: #117a8b;
+}
 
-.verifikasi-camera-btn:disabled {
+.verifikasi-camera-btn:disabled,
+.verifikasi-pdf-btn:disabled {
   background: #ccc;
   cursor: not-allowed;
+  box-shadow: none;
 }
 
-/* 7. Teks Instruksi / Empty State */
-.verifikasi-empty {
-  color: #666;
-  font-size: 14px;
-  text-align: center;
+/* 7. Wrapper untuk Scanner & Pilihan Kamera */
+.verifikasi-scanner-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin: 20px 0;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 8px;
 }
 
-/* 8. QR SCANNER CONTAINER */
 .verifikasi-scanner-container {
   position: relative;
-  margin: 20px 0;
   width: 100%;
-  max-width: 500px; /* usahakan scanner juga melebar supaya matching dengan card */
+  max-width: 450px;
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
@@ -164,8 +146,7 @@
 
 .verifikasi-scanner {
   width: 100%;
-  aspect-ratio: 2;
-  /* background: #000; */
+  background: #0071da;
 }
 
 .scanner-overlay {
@@ -184,55 +165,92 @@
   width: 80%;
   height: 2px;
   background: #007bff;
+  box-shadow: 0 0 10px #007bff;
   animation: scan 2s ease-in-out infinite;
 }
 
 @keyframes scan {
   0% {
-    transform: translateY(-40%);
+    transform: translateY(-50px);
   }
   50% {
-    transform: translateY(40%);
+    transform: translateY(50px);
   }
   100% {
-    transform: translateY(-40%);
+    transform: translateY(-50px);
   }
 }
 
-/* 9. PREVIEW DATA DARI QR */
+/* 8. Kartu Preview Data */
 .verifikasi-preview {
   margin: 20px 0;
   width: 100%;
-  max-width: 1200px; /* sesuaikan */
   background: #f8f9fa;
   padding: 20px;
   border-radius: 8px;
+  border: 1px solid #e9ecef;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  animation: fadeIn 0.5s;
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .verifikasi-preview h4 {
   font-size: 18px;
   color: #333;
-  margin-bottom: 12px;
+  margin-top: 0;
+  margin-bottom: 15px;
   font-weight: 600;
 }
 
-/* 10. TABEL DATA TERSTRUKTUR */
+/* 9. Aksi di dalam Kartu Preview */
+.verifikasi-preview-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.verifikasi-cancel-btn {
+  background: #6c757d;
+  color: white;
+  border: none;
+  padding: 12px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.verifikasi-cancel-btn:hover:not(:disabled) {
+  background: #5a6268;
+}
+
+/* 10. Tabel Data Terstruktur */
 .verifikasi-data-table {
   width: 100%;
   border: 1px solid #dfe1e5;
   border-radius: 6px;
   background: #fff;
   padding: 15px;
-  margin: 20px 0;
+  margin: 10px 0;
   box-sizing: border-box;
 }
 
 .verifikasi-data-row {
   display: flex;
   justify-content: space-between;
-  padding: 8px 0;
-  border-bottom: 1px solid #dfe1e5;
+  padding: 10px 0;
+  border-bottom: 1px solid #f1f1f1;
 }
 
 .verifikasi-data-row:last-child {
@@ -246,13 +264,13 @@
 }
 
 .verifikasi-data-value {
-  color: #666;
+  color: #555;
   flex: 2;
   text-align: left;
-  word-break: break-all;
+  word-break: break-word;
 }
 
-/* 11. PESAN ERROR / ISI AWAL */
+/* 11. Pesan Error / Status Awal */
 .verifikasi-result {
   width: 100%;
   margin: 20px 0;
@@ -260,92 +278,80 @@
 }
 
 .verifikasi-error {
-  color: #dc3545;
+  color: #721c24;
   font-size: 16px;
-  background: #f8d7da;
+  background-color: #f8d7da;
+  border: 1px solid #f5c6cb;
   padding: 12px;
   border-radius: 6px;
   margin-bottom: 20px;
 }
 
-/* 12. MODAL HASIL VERIFIKASI */
+.verifikasi-empty {
+  color: #666;
+  font-size: 14px;
+  text-align: center;
+  padding: 20px;
+  background: #f8f9fa;
+  border-radius: 8px;
+}
+
+/* 12. Modal Hasil Verifikasi */
 .verifikasi-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(0, 0, 0, 0.6);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
+  padding: 20px;
 }
 
 .verifikasi-modal {
   background: #fff;
   border-radius: 12px;
-  padding: 20px;
+  padding: 30px;
   width: 90%;
-  max-width: 1100px;
+  max-width: 800px;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
   position: relative;
   box-sizing: border-box;
 }
 
 .verifikasi-modal h3 {
   font-size: 20px;
-  color: #333;
+  color: #28a745;
   margin-bottom: 20px;
   font-weight: 600;
   text-align: center;
+}
+.verifikasi-modal h4 {
+  margin-top: 25px;
+  margin-bottom: 10px;
+  font-size: 16px;
+  color: #007bff;
+  border-bottom: 2px solid #007bff;
+  padding-bottom: 5px;
+  display: inline-block;
 }
 
 .verifikasi-modal-content {
   margin-bottom: 20px;
 }
 
-/* Tampilan data dalam modal */
-.verifikasi-modal .verifikasi-data-table {
-  margin: 0;
-}
-
-.verifikasi-modal .verifikasi-data-row {
-  padding: 6px 0;
-}
-
-.verifikasi-modal .verifikasi-data-label,
-.verifikasi-modal .verifikasi-data-value {
-  flex: 1 1 auto;
-}
-
-/* 13. TOMBOL TUTUP MODAL */
-.verifikasi-modal-close-btn {
-  background: #dc3545;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  display: block;
-  margin: 0 auto;
-  transition: background 0.3s ease;
-}
-
-.verifikasi-modal-close-btn:hover {
-  background: #c82333;
-}
-
+/* Grup Tombol Download */
 .verifikasi-download-group {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   justify-content: center;
-  margin: 15px 0;
+  margin: 20px 0;
 }
 
 .verifikasi-download-btn {
@@ -364,40 +370,54 @@
   background: #218838;
 }
 
-/* 14. RESPONSIVE (≤768px) */
+/* Tombol Tutup Modal */
+.verifikasi-modal-close-btn {
+  background: #dc3545;
+  color: white;
+  border: none;
+  padding: 12px 25px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  display: block;
+  margin: 20px auto 0 auto;
+  transition: background 0.3s ease;
+}
+
+.verifikasi-modal-close-btn:hover {
+  background: #c82333;
+}
+
+.verifikasi-verify-btn {
+  background: #007bff;
+  color: white;
+}
+
+/* Responsive */
 @media (max-width: 768px) {
   .verifikasi-container {
-    padding: 20px 20px 10px 20px;
-  }
-  .verifikasi-main-content {
-    flex-direction: column;
-    align-items: center;
+    padding: 15px;
   }
   .verifikasi-content {
-    width: 100%;
-    max-width: 100%;
     padding: 20px;
-    margin: 0;
   }
   .verifikasi-title {
     font-size: 20px;
   }
-  .verifikasi-input-group {
+  .verifikasi-input-group,
+  .verifikasi-button-group,
+  .verifikasi-preview-actions {
     flex-direction: column;
     gap: 10px;
+    align-items: stretch;
   }
-  .verifikasi-input-box,
-  .verifikasi-verify-btn,
-  .verifikasi-camera-btn {
-    font-size: 14px;
+  .verifikasi-data-row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 5px;
   }
-  .verifikasi-scanner-container {
-    max-width: 100%;
-  }
-  .verifikasi-preview {
-    max-width: 100%;
-  }
-  .verifikasi-data-table {
-    font-size: 13px;
+  .verifikasi-data-value {
+    text-align: left;
   }
 }
