@@ -19,7 +19,8 @@ const DownloadPdfButton = ({ id, label = 'Cetak Sertifikat (PDF)' }) => {
       const { nama, nim, universitas, jurusan, tanggalTerbit, hashMetadata } = sertifikat;
 
       // 3. Generate QR Code dari seluruh metadata
-      const qrValue = JSON.stringify(sertifikat);
+      const verificationUrl = `https://localhost:5173/verify/${hashMetadata}`;
+      const qrValue = verificationUrl;
       const qrDataURL = await QRCode.toDataURL(qrValue);
 
       // 4. Inisialisasi Dokumen PDF
