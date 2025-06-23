@@ -1,22 +1,31 @@
+// Dashboard.jsx
 import React, { useState } from 'react';
+import toast, { Toaster } from 'react-hot-toast';
 import './Dashboard.css';
 import Footer from '../../components/Footer';
 
 const initialState = {
+  nim: '',
   nama: '',
   universitas: '',
   jurusan: '',
-  sertifikatToefl: '',
-  sertifikatBTA: '',
-  sertifikatSKP: '',
-  tanggal: '',
+  tanggalTerbit: '',
+};
+
+const initialFiles = {
+  pdf_perpustakaan: null,
+  pdf_laboratorium: null,
+  pdf_keuangan: null,
+  pdf_skripsi: null,
+  pdf_toefl: null,
 };
 
 const Dashboard = () => {
   const [formData, setFormData] = useState(initialState);
-  const [fileData, setFileData] = useState({ pdf_toefl: null, pdf_bta: null, pdf_skp: null });
+  const [fileData, setFileData] = useState(initialFiles);
   const [errors, setErrors] = useState({});
   const [statusMsg, setStatusMsg] = useState('');
+  const [confirmed, setConfirmed] = useState(false);
 
   const universitasList = [
     'Universitas Muhammadiyah Yogyakarta',
@@ -24,7 +33,6 @@ const Dashboard = () => {
     'Institut Teknologi Bandung',
     'Universitas Indonesia',
   ];
-
   const jurusanList = [
     'Teknologi Informasi',
     'Teknik Elektro',
@@ -35,247 +43,205 @@ const Dashboard = () => {
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.nama) newErrors.nama = 'Nama wajib diisi';
-    if (!formData.universitas) newErrors.universitas = 'Pilih universitas';
-    if (!formData.jurusan) newErrors.jurusan = 'Pilih jurusan';
-    if (!formData.sertifikatToefl) newErrors.sertifikatToefl = 'No. Sertifikat TOEFL wajib diisi';
-    if (!formData.sertifikatBTA) newErrors.sertifikatBTA = 'No. Sertifikat BTA wajib diisi';
-    if (!formData.sertifikatSKP) newErrors.sertifikatSKP = 'No. Sertifikat SKP wajib diisi';
-    if (!formData.tanggal) newErrors.tanggal = 'Tanggal wajib diisi';
-    if (!fileData.pdf_toefl) newErrors.pdf_toefl = 'File PDF TOEFL wajib diupload';
-    if (!fileData.pdf_bta) newErrors.pdf_bta = 'File PDF BTA wajib diupload';
-    if (!fileData.pdf_skp) newErrors.pdf_skp = 'File PDF SKP wajib diupload';
+    Object.entries(formData).forEach(([key, val]) => {
+      if (!val) newErrors[key] = 'Wajib diisi';
+    });
+    Object.entries(fileData).forEach(([key, file]) => {
+      if (!file) newErrors[key] = 'File PDF wajib diupload';
+    });
+    if (!confirmed) newErrors.confirmed = 'Anda harus menyetujui data sudah benar';
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-    if (errors[e.target.name]) {
-      setErrors({ ...errors, [e.target.name]: null });
-    }
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+    setErrors((prev) => ({ ...prev, [name]: null }));
   };
 
   const handleFileChange = (e) => {
-    setFileData({ ...fileData, [e.target.name]: e.target.files[0] });
-    if (errors[e.target.name]) {
-      setErrors({ ...errors, [e.target.name]: null });
-    }
+    const { name, files } = e.target;
+    setFileData({ ...fileData, [name]: files[0] });
+    setErrors((prev) => ({ ...prev, [name]: null }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setStatusMsg('');
     if (!validateForm()) {
-      setStatusMsg('Harap perbaiki error pada form.');
+      toast.error('Data belum lengkap. Mohon isi semua field.');
+      setStatusMsg('Maaf Data Belum Lengkap Silahkan Isi Terlebih Dahulu.');
       return;
     }
-    setStatusMsg('Menerbitkan sertifikat ke blockchain...');
+
     try {
       const fd = new FormData();
-      Object.entries(formData).forEach(([key, val]) => fd.append(key, val));
-      fd.append('pdf_toefl', fileData.pdf_toefl);
-      fd.append('pdf_bta', fileData.pdf_bta);
-      fd.append('pdf_skp', fileData.pdf_skp);
+      Object.entries(formData).forEach(([k, v]) => fd.append(k, v));
+      Object.entries(fileData).forEach(([k, f]) => fd.append(k, f));
 
-      const res = await fetch('http://127.0.0.1:5000/terbitkan_sertifikat_blockchain', {
+      const uploadPromise = fetch('http://127.0.0.1:5000/sertifikat', {
         method: 'POST',
         body: fd,
+      }).then(async (res) => {
+        const body = await res.json();
+        if (!res.ok) throw new Error(body.error || 'Request gagal');
+        return body;
       });
-      const data = await res.json();
-      if (res.ok && data.transaction_hash) {
-        setStatusMsg('Sukses! Sertifikat telah diterbitkan di blockchain.');
-        setFormData(initialState);
-        setFileData({ pdf_toefl: null, pdf_bta: null, pdf_skp: null });
-        setErrors({});
-      } else {
-        setStatusMsg(data.error || 'Gagal menerbitkan sertifikat. Coba lagi.');
-      }
+
+      toast.promise(uploadPromise, {
+        loading: 'Mengunggah data & file…',
+        success: '✅ Sertifikat berhasil diterbitkan!',
+        error: (err) => `❌ Gagal: ${err.message}`,
+      });
+
+      await uploadPromise;
+
+      setFormData(initialState);
+      setFileData(initialFiles);
+      setConfirmed(false);
+      setErrors({});
     } catch (err) {
-      setStatusMsg('Terjadi kesalahan koneksi. Pastikan server backend berjalan.');
-      console.error('API call failed:', err);
+      setStatusMsg(`❌ Gagal: ${err.message}`);
     }
   };
 
   return (
     <div className="dashboard-page-content">
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          style: {
+            minWidth: '350px', // lebih lebar
+            padding: '16px 24px',
+            color: '#788286', // teks putih
+            background: 'rgba(85, 169, 224, 0.34)', // biru laut
+            borderRadius: '8px',
+            boxShadow: '0 4px 14px rgba(0, 95, 153, 0.2)',
+          },
+          success: {
+            iconTheme: {
+              primary: '#FFFFFF',
+              secondary: '#d1e8fd',
+            },
+          },
+          error: {
+            iconTheme: {
+              primary: '#FFFFFF',
+              secondary: '#D9534F',
+            },
+          },
+        }}
+      />
       <main className="dashboard-container">
         <div className="dashboard-header">
           <h2 className="dashboard-heading">Terbitkan Sertifikat</h2>
-          <p className="dashboard-subtext">
-            Isi data sertifikat di bawah ini dengan lengkap dan benar. Semua field wajib diisi.
-          </p>
         </div>
 
         <form onSubmit={handleSubmit} className="dashboard-form">
-          <div className="dashboard-card">
-            {/* Text Inputs */}
+          <div className="dashboard-form-group">
+            <label htmlFor="nim">NIM</label>
+            <input
+              id="nim"
+              name="nim"
+              value={formData.nim}
+              onChange={handleChange}
+              className={`dashboard-input ${errors.nim ? 'input-error' : ''}`}
+            />
+            {errors.nim && <p className="error-text">{errors.nim}</p>}
+          </div>
+
+          <div className="dashboard-form-group">
+            <label htmlFor="nama">Nama Lengkap</label>
+            <input
+              id="nama"
+              name="nama"
+              value={formData.nama}
+              onChange={handleChange}
+              className={`dashboard-input ${errors.nama ? 'input-error' : ''}`}
+            />
+            {errors.nama && <p className="error-text">{errors.nama}</p>}
+          </div>
+
+          <div className="dashboard-form-row">
             <div className="dashboard-form-group">
-              <label htmlFor="nama" className="dashboard-label">
-                Nama Lengkap
-              </label>
-              <input
-                id="nama"
-                name="nama"
-                type="text"
-                placeholder="Contoh: Budi Santoso"
-                value={formData.nama}
+              <label htmlFor="universitas">Universitas</label>
+              <select
+                id="universitas"
+                name="universitas"
+                value={formData.universitas}
                 onChange={handleChange}
-                className={`dashboard-input ${errors.nama ? 'input-error' : ''}`}
-              />
-              {errors.nama && <p className="error-text">{errors.nama}</p>}
+                className={`dashboard-input ${errors.universitas ? 'input-error' : ''}`}>
+                <option value="">-- Pilih Universitas --</option>
+                {universitasList.map((u) => (
+                  <option key={u} value={u}>
+                    {u}
+                  </option>
+                ))}
+              </select>
+              {errors.universitas && <p className="error-text">{errors.universitas}</p>}
             </div>
-
-            <div className="dashboard-form-row">
-              <div className="dashboard-form-group">
-                <label htmlFor="universitas" className="dashboard-label">
-                  Universitas
-                </label>
-                <select
-                  id="universitas"
-                  name="universitas"
-                  value={formData.universitas}
-                  onChange={handleChange}
-                  className={`dashboard-input ${errors.universitas ? 'input-error' : ''}`}>
-                  <option value="">-- Pilih Universitas --</option>
-                  {universitasList.map((u) => (
-                    <option key={u} value={u}>
-                      {u}
-                    </option>
-                  ))}
-                </select>
-                {errors.universitas && <p className="error-text">{errors.universitas}</p>}
-              </div>
-              <div className="dashboard-form-group">
-                <label htmlFor="jurusan" className="dashboard-label">
-                  Jurusan
-                </label>
-                <select
-                  id="jurusan"
-                  name="jurusan"
-                  value={formData.jurusan}
-                  onChange={handleChange}
-                  className={`dashboard-input ${errors.jurusan ? 'input-error' : ''}`}>
-                  <option value="">-- Pilih Jurusan --</option>
-                  {jurusanList.map((j) => (
-                    <option key={j} value={j}>
-                      {j}
-                    </option>
-                  ))}
-                </select>
-                {errors.jurusan && <p className="error-text">{errors.jurusan}</p>}
-              </div>
-            </div>
-
-            <div className="dashboard-form-row">
-              <div className="dashboard-form-group">
-                <label htmlFor="sertifikatToefl" className="dashboard-label">
-                  No. Sertifikat TOEFL
-                </label>
-                <input
-                  id="sertifikatToefl"
-                  name="sertifikatToefl"
-                  type="text"
-                  placeholder="Contoh: 1234567890"
-                  value={formData.sertifikatToefl}
-                  onChange={handleChange}
-                  className={`dashboard-input ${errors.sertifikatToefl ? 'input-error' : ''}`}
-                />
-                {errors.sertifikatToefl && <p className="error-text">{errors.sertifikatToefl}</p>}
-              </div>
-              <div className="dashboard-form-group">
-                <label htmlFor="sertifikatBTA" className="dashboard-label">
-                  No. Sertifikat BTA
-                </label>
-                <input
-                  id="sertifikatBTA"
-                  name="sertifikatBTA"
-                  type="text"
-                  placeholder="Contoh: 0987654321"
-                  value={formData.sertifikatBTA}
-                  onChange={handleChange}
-                  className={`dashboard-input ${errors.sertifikatBTA ? 'input-error' : ''}`}
-                />
-                {errors.sertifikatBTA && <p className="error-text">{errors.sertifikatBTA}</p>}
-              </div>
-            </div>
-
             <div className="dashboard-form-group">
-              <label htmlFor="sertifikatSKP" className="dashboard-label">
-                No. Sertifikat SKP
-              </label>
-              <input
-                id="sertifikatSKP"
-                name="sertifikatSKP"
-                type="text"
-                placeholder="Contoh: 1122334455"
-                value={formData.sertifikatSKP}
+              <label htmlFor="jurusan">Jurusan</label>
+              <select
+                id="jurusan"
+                name="jurusan"
+                value={formData.jurusan}
                 onChange={handleChange}
-                className={`dashboard-input ${errors.sertifikatSKP ? 'input-error' : ''}`}
-              />
-              {errors.sertifikatSKP && <p className="error-text">{errors.sertifikatSKP}</p>}
+                className={`dashboard-input ${errors.jurusan ? 'input-error' : ''}`}>
+                <option value="">-- Pilih Jurusan --</option>
+                {jurusanList.map((j) => (
+                  <option key={j} value={j}>
+                    {j}
+                  </option>
+                ))}
+              </select>
+              {errors.jurusan && <p className="error-text">{errors.jurusan}</p>}
             </div>
+          </div>
 
-            <div className="dashboard-form-group">
-              <label htmlFor="tanggal" className="dashboard-label">
-                Tanggal Terbit
+          <div className="dashboard-form-group">
+            <label htmlFor="tanggalTerbit">Tanggal Terbit</label>
+            <input
+              id="tanggalTerbit"
+              name="tanggalTerbit"
+              type="date"
+              value={formData.tanggalTerbit}
+              onChange={handleChange}
+              className={`dashboard-input ${errors.tanggalTerbit ? 'input-error' : ''}`}
+            />
+            {errors.tanggalTerbit && <p className="error-text">{errors.tanggalTerbit}</p>}
+          </div>
+
+          {Object.keys(initialFiles).map((key) => (
+            <div className="dashboard-form-group" key={key}>
+              <label htmlFor={key}>
+                {key.replace('pdf_', '').replace(/_/g, ' ').toUpperCase()}
               </label>
               <input
-                id="tanggal"
-                name="tanggal"
-                type="date"
-                value={formData.tanggal}
-                onChange={handleChange}
-                className={`dashboard-input ${errors.tanggal ? 'input-error' : ''}`}
-              />
-              {errors.tanggal && <p className="error-text">{errors.tanggal}</p>}
-            </div>
-
-            {/* File Inputs */}
-            <div className="dashboard-form-group">
-              <label htmlFor="pdf_toefl" className="dashboard-label">
-                Upload PDF TOEFL
-              </label>
-              <input
-                id="pdf_toefl"
-                name="pdf_toefl"
+                id={key}
+                name={key}
                 type="file"
                 accept="application/pdf"
                 onChange={handleFileChange}
-                className={`dashboard-input ${errors.pdf_toefl ? 'input-error' : ''}`}
+                className={`dashboard-input ${errors[key] ? 'input-error' : ''}`}
               />
-              {errors.pdf_toefl && <p className="error-text">{errors.pdf_toefl}</p>}
+              {errors[key] && <p className="error-text">{errors[key]}</p>}
             </div>
+          ))}
 
-            <div className="dashboard-form-group">
-              <label htmlFor="pdf_bta" className="dashboard-label">
-                Upload PDF BTA
-              </label>
+          <div className="dashboard-form-group">
+            <label className="confirm-label">
               <input
-                id="pdf_bta"
-                name="pdf_bta"
-                type="file"
-                accept="application/pdf"
-                onChange={handleFileChange}
-                className={`dashboard-input ${errors.pdf_bta ? 'input-error' : ''}`}
-              />
-              {errors.pdf_bta && <p className="error-text">{errors.pdf_bta}</p>}
-            </div>
-
-            <div className="dashboard-form-group">
-              <label htmlFor="pdf_skp" className="dashboard-label">
-                Upload PDF SKP
-              </label>
-              <input
-                id="pdf_skp"
-                name="pdf_skp"
-                type="file"
-                accept="application/pdf"
-                onChange={handleFileChange}
-                className={`dashboard-input ${errors.pdf_skp ? 'input-error' : ''}`}
-              />
-              {errors.pdf_skp && <p className="error-text">{errors.pdf_skp}</p>}
-            </div>
+                type="checkbox"
+                checked={confirmed}
+                onChange={(e) => {
+                  setConfirmed(e.target.checked);
+                  setErrors((prev) => ({ ...prev, confirmed: null }));
+                }}
+              />{' '}
+              Saya telah memeriksa dan data sudah benar
+            </label>
+            {errors.confirmed && <p className="error-text">{errors.confirmed}</p>}
           </div>
 
           <div className="dashboard-form-action">
@@ -289,16 +255,10 @@ const Dashboard = () => {
           <div className="dashboard-status">
             <p
               className={`status-text ${
-                statusMsg.includes('Sukses')
-                  ? 'success'
-                  : statusMsg.includes('Harap perbaiki')
-                  ? 'error'
-                  : statusMsg.includes('Gagal')
-                  ? 'error'
-                  : 'info'
-              }
-            `}>
-              {statusMsg}
+                statusMsg.includes('✅') ? 'success' : statusMsg.includes('❌') ? 'error' : 'info'
+              }`}>
+              {' '}
+              {statusMsg}{' '}
             </p>
           </div>
         )}
