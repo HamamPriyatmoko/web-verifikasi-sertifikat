@@ -18,6 +18,7 @@ const DaftarSertifikat = () => {
       .then((data) => {
         setSertifikatData(data.sertifikat || []);
         setFilteredData(data.sertifikat || []);
+        console.log(data.sertifikat);
       });
   }, []);
 
@@ -29,7 +30,7 @@ const DaftarSertifikat = () => {
       sertifikatData.filter(
         (item) =>
           (item.nama && item.nama.toLowerCase().includes(term.toLowerCase())) ||
-          (item.jurusan && item.jurusan.toLowerCase().includes(term.toLowerCase())),
+          (item.terbit && item.terbit.toLowerCase().includes(term.toLowerCase())),
       ),
     );
     setCurrentPage(1); // reset ke halaman 1 saat pencarian berubah
@@ -85,14 +86,14 @@ const DaftarSertifikat = () => {
               </select>
             </div>
           </div>
-
+          {console.log(sertifikatData)}
           <table className="ds-daftar-table">
             <thead>
               <tr>
                 <th>Foto</th>
                 <th>Nama</th>
                 <th>Jurusan</th>
-                <th>Universitas</th>
+                <th>Tanggal Terbit</th>
                 <th>Action</th>
               </tr>
             </thead>
@@ -108,9 +109,12 @@ const DaftarSertifikat = () => {
                   </td>
                   <td>{item.nama || '-'}</td>
                   <td>{item.jurusan || '-'}</td>
-                  <td>{item.universitas || '-'}</td>
+                  <td>{item.terbit || '-'}</td>
                   <td>
-                    <DownloadPdfButton id={item.id} className="ds-action-btn ds-download-btn" />
+                    <DownloadPdfButton
+                      id={item.id}
+                      className="ds-action-btn ds-download-btn"
+                      label="Download PDF"></DownloadPdfButton>
                   </td>
                 </tr>
               ))}
