@@ -10,11 +10,7 @@ const Sidebar = () => {
   return (
     <div className="sidebar">
       <div>
-        <h1 className="sidebar-logo">
-          Sertifikat
-          <br />
-          Blockchain
-        </h1>
+        <h1 className="sidebar-logo">B-Verify</h1>
         <div className="sidebar-nav-links">
           <Link to="/dashboard" className={currentPath === '/dashboard' ? 'active' : ''}>
             Terbitkan
