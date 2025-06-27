@@ -1,146 +1,113 @@
+// src/components/downloadpdf/DownloadPdfButton.jsx
 import React from 'react';
 import jsPDF from 'jspdf';
 import QRCode from 'qrcode';
 
-const DownloadPdfButton = ({ id, label = 'Cetak Sertifikat (PDF)' }) => {
+const DownloadPdfButton = ({ nim, label = 'Cetak Sertifikat (PDF)' }) => {
   const handleDownloadPDF = async () => {
     try {
-      // 1. Fetch data sertifikat dari API backend
-      const res = await fetch(`http://localhost:5000/sertifikat/${id}`);
-      const responseData = await res.json();
-
+      // 1. Fetch data sertifikat detail
+      const res = await fetch(`http://localhost:5000/api/sertifikat/nim/${nim}`);
+      const payload = await res.json();
       if (!res.ok) {
-        throw new Error(responseData.error || 'Gagal mengambil data dari blockchain');
+        throw new Error(payload.error || payload.message || 'Gagal mengambil data sertifikat');
       }
 
-      const { sertifikat } = responseData;
+      // 2. Destructure on-chain + off-chain
+      const { sertifikat: onChain, dataOffChain: offChain = {} } = payload;
+      // onChain: { nim, universitas, hashMetadata, cidDetail, nomerSertifikat, ... }
+      // offChain: { nama, jurusan, fakultas, tahunLulus, pathIjazah, pathSkpi }
+      const { nomerSertifikat, universitas, hashMetadata } = onChain;
+      const { nama, jurusan, tahunLulus } = offChain;
 
-      // 2. Siapkan data yang akan ditampilkan
-      const { nama, nim, universitas, jurusan, tanggalTerbit, hashMetadata } = sertifikat;
+      // 3. Generate QR code untuk verifikasi
+      const verificationUrl = `https://your-domain.com/verify/${hashMetadata}`;
+      const qrDataURL = await QRCode.toDataURL(verificationUrl);
 
-      // 3. Generate QR Code dari seluruh metadata
-      const verificationUrl = `https://localhost:5173/verify/${hashMetadata}`;
-      const qrValue = verificationUrl;
-      const qrDataURL = await QRCode.toDataURL(qrValue);
-
-      // 4. Inisialisasi Dokumen PDF
+      // 4. Setup jsPDF
       const doc = new jsPDF('p', 'mm', 'a4');
-      const pageWidth = doc.internal.pageSize.getWidth();
-      const pageHeight = doc.internal.pageSize.getHeight();
-      const pageCenter = pageWidth / 2;
+      const w = doc.internal.pageSize.getWidth();
+      const h = doc.internal.pageSize.getHeight();
+      const cx = w / 2;
 
-      // --- MULAI MENDESAIN SERTIFIKAT ---
+      // — Header —
+      doc.setFontSize(16).setFont(undefined, 'bold');
+      doc.text(universitas.toUpperCase(), cx, 25, { align: 'center' });
+      doc.setFontSize(22).text('SERTIFIKAT KELULUSAN', cx, 48, { align: 'center' });
+      doc.setLineWidth(0.5).line(30, 35, w - 30, 35);
 
-      // A. Header Sertifikat (Tetap Sama)
-      doc.setFont(undefined, 'bold');
-      doc.setFontSize(16);
-      doc.text(universitas.toUpperCase(), pageCenter, 25, { align: 'center' });
-      doc.setFontSize(14);
-      doc.text('FAKULTAS TEKNIK', pageCenter, 32, { align: 'center' });
-      doc.setLineWidth(0.5);
-      doc.line(30, 35, pageWidth - 30, 35);
-      doc.setFontSize(22);
-      doc.text('SERTIFIKAT KELULUSAN', pageCenter, 48, { align: 'center' });
-      // doc.setFontSize(12);
-      // doc.setFont(undefined, 'normal');
-      // doc.text(`Nomor: ${nim}`, pageCenter, 55, { align: 'center' });
+      // — Hash (digital signature) —
+      let y = 70;
+      doc
+        .setFontSize(12)
+        .setFont(undefined, 'bold')
+        .text('Tanda Tangan Digital (Blockchain Hash)', cx, y, { align: 'center' });
+      y += 6;
+      doc.setFont('Courier', 'normal').setFontSize(9).setTextColor(100);
+      const lines = doc.splitTextToSize(hashMetadata, w - 60);
+      doc.text(lines, cx, y, { align: 'center' });
+      y += lines.length * 4 + 10;
 
-      // B. Tanda Tangan Digital (Hash) (Tetap Sama)
-      let currentY = 70;
-      doc.setFontSize(12);
-      doc.setFont(undefined, 'bold');
-      doc.text('Tanda Tangan Digital (Blockchain Hash)', pageCenter, currentY, { align: 'center' });
-      currentY += 5;
-      doc.setFont('Courier', 'normal');
-      doc.setFontSize(9);
-      doc.setTextColor(100);
-      const hashLines = doc.splitTextToSize(hashMetadata, pageWidth - 60);
-      doc.text(hashLines, pageCenter, currentY, { align: 'center' });
-      currentY += hashLines.length * 4 + 10; // Beri spasi lebih setelah hash
+      // — Nama & status —
+      doc
+        .setTextColor(40, 63, 125)
+        .setFont(undefined, 'bold')
+        .setFontSize(24)
+        .text(nama.toUpperCase(), cx, y, { align: 'center' });
+      y += 12;
+      doc
+        .setFont(undefined, 'normal')
+        .setFontSize(12)
+        .setTextColor(0)
+        .text('telah memenuhi segala syarat kelulusan dan dinyatakan', cx, y, { align: 'center' });
+      y += 10;
+      doc.setFont(undefined, 'bold').setFontSize(16).text('LULUS', cx, y, { align: 'center' });
+      y += 15;
 
-      // ======================================================================
-      // C. Isi Sertifikat (Badan Teks) - BAGIAN YANG DIUBAH SESUAI GAMBAR
-      // ======================================================================
-
-      // Nama Mahasiswa
-      doc.setFontSize(24);
-      doc.setFont(undefined, 'bold');
-      doc.setTextColor(40, 63, 125); // Warna biru tua
-      doc.text(nama.toUpperCase(), pageCenter, currentY, { align: 'center' });
-      currentY += 10;
-
-      // Teks Kelulusan
-      doc.setFontSize(12);
-      doc.setFont(undefined, 'normal');
-      doc.setTextColor(0, 0, 0); // Kembali ke warna hitam
-      doc.text('telah memenuhi segala syarat kelulusan dan dinyatakan', pageCenter, currentY, {
-        align: 'center',
-      });
-      currentY += 10;
-
-      // Status LULUS
-      doc.setFontSize(16);
-      doc.setFont(undefined, 'bold');
-      doc.text('LULUS', pageCenter, currentY, { align: 'center' });
-      currentY += 15; // Beri spasi lebih besar
-
-      // Detail Kelulusan (Format Key-Value)
+      // — Detail kelulusan (ditambah nomerSertifikat) —
       const details = {
+        'Nomor Sertifikat': nomerSertifikat,
         'Nomor Induk Mahasiswa': nim,
         'Program Studi': jurusan,
-        'Tanggal Lulus': tanggalTerbit,
+        'Tanggal Lulus': tahunLulus,
       };
-
-      const keyAlignX = 88; // Semua 'key' akan berakhir di posisi x=88
-      const valueStartX = 92;
-
+      const keyX = 80;
+      const valX = 92;
       doc.setFontSize(12);
-      Object.entries(details).forEach(([key, value]) => {
-        // Render Key dengan rata kanan (right align)
-        doc.setFont(undefined, 'normal');
-        doc.text(key + ' :', keyAlignX, currentY, { align: 'right' });
-
-        // Render Value (bold)
-        doc.setFont(undefined, 'bold');
-        doc.text(String(value), valueStartX, currentY);
-
-        currentY += 8; // Pindah ke baris berikutnya
+      Object.entries(details).forEach(([k, v]) => {
+        doc.setFont(undefined, 'normal').text(`${k} :`, keyX, y, { align: 'right' });
+        doc.setFont(undefined, 'bold').text(String(v), valX, y);
+        y += 8;
       });
 
-      // ======================================================================
-      // AKHIR DARI BAGIAN YANG DIUBAH
-      // ======================================================================
+      // — Tanggal & tanda tangan fisik placeholder —
+      const sigY = h - 90;
+      doc
+        .setFont(undefined, 'normal')
+        .setFontSize(12)
+        .text(`Yogyakarta, ${tahunLulus}`, w - 45, sigY, { align: 'center' });
+      doc.text('Dekan,', 55, sigY + 7, { align: 'center' });
+      doc.text('(Nama Dekan)', 55, sigY + 30, { align: 'center' });
+      doc.text('Rektor,', w - 45, sigY + 7, { align: 'center' });
+      doc.text('(Nama Rektor)', w - 45, sigY + 30, { align: 'center' });
 
-      // D. Area Tanda Tangan Fisik (Placeholder) (Posisinya disesuaikan)
-      const signatureY = pageHeight - 90;
-      doc.setFontSize(12);
-      doc.setFont(undefined, 'normal');
-      doc.text(`Yogyakarta, ${tanggalTerbit}`, 165, signatureY, { align: 'center' });
-      doc.text('Dekan,', 55, signatureY + 7, { align: 'center' });
-      doc.text('Rektor,', 165, signatureY + 7, { align: 'center' });
-      doc.text('(Nama Dekan di Sini)', 55, signatureY + 30, { align: 'center' });
-      doc.text('(Nama Rektor di Sini)', 165, signatureY + 30, { align: 'center' });
+      // — QR Code Footer —
+      const qrY = h - 50;
+      doc.setLineWidth(0.2).line(15, qrY - 5, w - 15, qrY - 5);
+      doc.addImage(qrDataURL, 'PNG', 20, qrY, 35, 35);
+      doc
+        .setFontSize(8)
+        .setFont(undefined, 'bold')
+        .text('Verifikasi Keaslian Dokumen:', 65, qrY + 15);
+      doc
+        .setFont(undefined, 'normal')
+        .text('Pindai QR Code untuk detail sertifikat di blockchain.', 65, qrY + 19);
 
-      // E. Bagian Verifikasi QR Code (Footer) (Tetap Sama)
-      const verificationY = pageHeight - 45;
-      doc.setLineWidth(0.2);
-      doc.line(15, verificationY - 5, pageWidth - 15, verificationY - 5);
-      doc.addImage(qrDataURL, 'PNG', 20, verificationY, 35, 35);
-      doc.setFontSize(8);
-      doc.setFont(undefined, 'bold');
-      doc.text('Verifikasi Keaslian Dokumen:', 65, verificationY + 15);
-      doc.setFont(undefined, 'normal');
-      doc.text(
-        'Pindai QR Code untuk melihat detail data sertifikat yang tercatat di blockchain.',
-        65,
-        verificationY + 19,
-      );
-
-      // --- SELESAI MENDESAIN, SIMPAN PDF ---
-      doc.save(`Sertifikat-${nama.replace(/\s/g, '_')}-${nim}.pdf`);
-    } catch (e) {
-      console.error(e);
-      alert('Terjadi error saat membuat PDF: ' + e.message);
+      // — Save PDF —
+      doc.save(`Sertifikat_${nama.replace(/\s/g, '_')}_${nim}.pdf`);
+    } catch (err) {
+      console.error(err);
+      alert('Gagal membuat PDF: ' + err.message);
     }
   };
 

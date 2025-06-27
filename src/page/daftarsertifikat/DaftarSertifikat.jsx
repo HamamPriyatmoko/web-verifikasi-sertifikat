@@ -1,3 +1,4 @@
+// src/pages/DaftarSertifikat.js
 import React, { useState, useEffect } from 'react';
 import './DaftarSertifikat.css';
 import { FaSearch } from 'react-icons/fa';
@@ -5,56 +6,43 @@ import Footer from '../../components/Footer';
 import DownloadPdfButton from '../../components/downloadpdf/DownloadPdfButton';
 
 const DaftarSertifikat = () => {
-  const [sertifikatData, setSertifikatData] = useState([]);
+  const [allData, setAllData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
 
-  // Fetch data sertifikat dari API
+  // 1) Ambil semua data sertifikat
   useEffect(() => {
     fetch('http://127.0.0.1:5000/api/sertifikat')
       .then((res) => res.json())
-      .then((data) => {
-        setSertifikatData(data.sertifikat || []);
-        setFilteredData(data.sertifikat || []);
-        console.log(data.sertifikat);
-      });
+      .then(({ sertifikat = [] }) => {
+        setAllData(sertifikat);
+        setFilteredData(sertifikat);
+      })
+      .catch(console.error);
   }, []);
 
-  // Search berdasarkan nama atau jurusan
-  const handleSearch = (event) => {
-    const term = event.target.value;
+  // 2) Search/filter by nim atau universitas
+  const handleSearch = (e) => {
+    const term = e.target.value;
     setSearchTerm(term);
+    const lower = term.toLowerCase();
     setFilteredData(
-      sertifikatData.filter(
+      allData.filter(
         (item) =>
-          (item.nama && item.nama.toLowerCase().includes(term.toLowerCase())) ||
-          (item.terbit && item.terbit.toLowerCase().includes(term.toLowerCase())),
+          item.nim.toLowerCase().includes(lower) ||
+          (item.universitas || '').toLowerCase().includes(lower),
       ),
     );
     setCurrentPage(1);
   };
 
-  // Pagination
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredData.slice(indexOfFirstItem, indexOfLastItem);
-
-  const pageNumbers = [];
-  for (let i = 1; i <= Math.ceil(filteredData.length / itemsPerPage); i++) {
-    pageNumbers.push(i);
-  }
-
-  const handlePageChange = (pageNumber) => setCurrentPage(pageNumber);
-
-  // Tampilkan inisial dari nama
-  const getInitial = (nama) => {
-    if (!nama) return '';
-    const parts = nama.trim().split(' ');
-    if (parts.length === 1) return parts[0][0].toUpperCase();
-    return (parts[0][0] + parts[1][0]).toUpperCase();
-  };
+  // 3) Pagination
+  const lastIdx = currentPage * itemsPerPage;
+  const firstIdx = lastIdx - itemsPerPage;
+  const currentItems = filteredData.slice(firstIdx, lastIdx);
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
 
   return (
     <div id="daftar-page">
@@ -68,7 +56,7 @@ const DaftarSertifikat = () => {
                 <input
                   type="text"
                   className="ds-search-bar"
-                  placeholder="Cari nama atau jurusan"
+                  placeholder="Cari NIM atau universitas"
                   value={searchTerm}
                   onChange={handleSearch}
                 />
@@ -80,54 +68,53 @@ const DaftarSertifikat = () => {
                   setItemsPerPage(Number(e.target.value));
                   setCurrentPage(1);
                 }}>
-                <option value={5}>Showing 5</option>
-                <option value={10}>Showing 10</option>
-                <option value={15}>Showing 15</option>
+                <option value={5}>5 per halaman</option>
+                <option value={10}>10 per halaman</option>
+                <option value={15}>15 per halaman</option>
               </select>
             </div>
           </div>
-          {console.log(sertifikatData)}
+
           <table className="ds-daftar-table">
             <thead>
               <tr>
-                <th>Foto</th>
-                <th>Nama</th>
-                <th>Jurusan</th>
-                <th>Tanggal Terbit</th>
+                <th>NIM</th>
+                <th>Universitas</th>
                 <th>Action</th>
               </tr>
             </thead>
             <tbody>
               {currentItems.map((item) => (
                 <tr key={item.id}>
-                  <td>
-                    <div
-                      className="ds-user-photo"
-                      style={{ backgroundColor: '#007bff', color: '#fff' }}>
-                      {getInitial(item.nama)}
-                    </div>
-                  </td>
-                  <td>{item.nama || '-'}</td>
-                  <td>{item.jurusan || '-'}</td>
-                  <td>{item.terbit || '-'}</td>
+                  <td>{item.nim}</td>
+                  <td>{item.universitas || '-'}</td>
                   <td>
                     <DownloadPdfButton
-                      id={item.id}
+                      nim={item.nim}
                       className="ds-action-btn ds-download-btn"
-                      label="Download PDF"></DownloadPdfButton>
+                      label="Download PDF"
+                    />
                   </td>
                 </tr>
               ))}
+              {currentItems.length === 0 && (
+                <tr>
+                  <td colSpan={3} style={{ textAlign: 'center', padding: '1rem' }}>
+                    Tidak ada data.
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
 
+          {/* Pagination controls */}
           <div className="ds-pagination">
-            {pageNumbers.map((number) => (
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((num) => (
               <button
-                key={number}
-                className={`ds-page-btn ${currentPage === number ? 'ds-active' : ''}`}
-                onClick={() => handlePageChange(number)}>
-                {number}
+                key={num}
+                className={`ds-page-btn ${currentPage === num ? 'ds-active' : ''}`}
+                onClick={() => setCurrentPage(num)}>
+                {num}
               </button>
             ))}
           </div>

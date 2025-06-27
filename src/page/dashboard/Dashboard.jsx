@@ -1,23 +1,24 @@
-// Dashboard.jsx
+// src/pages/Dashboard.jsx
 import React, { useState } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 import './Dashboard.css';
 import Footer from '../../components/Footer';
 
+// Initial form fields matching API requirements
 const initialState = {
   nim: '',
   nama: '',
   universitas: '',
   jurusan: '',
-  tanggalTerbit: '',
+  nomerSertifikat: '',
+  fakultas: '',
+  tahunLulus: '',
 };
 
+// Only Ijazah & SKPI files
 const initialFiles = {
-  pdf_perpustakaan: null,
-  pdf_laboratorium: null,
-  pdf_keuangan: null,
-  pdf_skripsi: null,
-  pdf_toefl: null,
+  file_ijazah: null,
+  file_skpi: null,
 };
 
 const Dashboard = () => {
@@ -41,6 +42,7 @@ const Dashboard = () => {
     'Teknik Mesin',
   ];
 
+  // Validate all fields & files
   const validateForm = () => {
     const newErrors = {};
     Object.entries(formData).forEach(([key, val]) => {
@@ -70,7 +72,7 @@ const Dashboard = () => {
     e.preventDefault();
     if (!validateForm()) {
       toast.error('Data belum lengkap. Mohon isi semua field.');
-      setStatusMsg('Maaf Data Belum Lengkap Silahkan Isi Terlebih Dahulu.');
+      setStatusMsg('Maaf, data belum lengkap. Silakan isi semua field.');
       return;
     }
 
@@ -96,10 +98,12 @@ const Dashboard = () => {
 
       await uploadPromise;
 
+      // reset form
       setFormData(initialState);
       setFileData(initialFiles);
       setConfirmed(false);
       setErrors({});
+      setStatusMsg('✅ Sertifikat berhasil diterbitkan!');
     } catch (err) {
       setStatusMsg(`❌ Gagal: ${err.message}`);
     }
@@ -111,33 +115,29 @@ const Dashboard = () => {
         position="top-right"
         toastOptions={{
           style: {
-            minWidth: '350px', // lebih lebar
+            minWidth: '350px',
             padding: '16px 24px',
-            color: '#788286', // teks putih
-            background: 'rgba(85, 169, 224, 0.34)', // biru laut
+            color: '#788286',
+            background: 'rgba(85, 169, 224, 0.34)',
             borderRadius: '8px',
             boxShadow: '0 4px 14px rgba(0, 95, 153, 0.2)',
           },
           success: {
-            iconTheme: {
-              primary: '#FFFFFF',
-              secondary: '#d1e8fd',
-            },
+            iconTheme: { primary: '#FFFFFF', secondary: '#d1e8fd' },
           },
           error: {
-            iconTheme: {
-              primary: '#FFFFFF',
-              secondary: '#D9534F',
-            },
+            iconTheme: { primary: '#FFFFFF', secondary: '#D9534F' },
           },
         }}
       />
+
       <main className="dashboard-container">
         <div className="dashboard-header">
           <h2 className="dashboard-heading">Terbitkan Sertifikat</h2>
         </div>
 
         <form onSubmit={handleSubmit} className="dashboard-form">
+          {/* NIM */}
           <div className="dashboard-form-group">
             <label htmlFor="nim">NIM</label>
             <input
@@ -146,10 +146,12 @@ const Dashboard = () => {
               value={formData.nim}
               onChange={handleChange}
               className={`dashboard-input ${errors.nim ? 'input-error' : ''}`}
+              disabled={false}
             />
             {errors.nim && <p className="error-text">{errors.nim}</p>}
           </div>
 
+          {/* Nama Lengkap */}
           <div className="dashboard-form-group">
             <label htmlFor="nama">Nama Lengkap</label>
             <input
@@ -162,6 +164,7 @@ const Dashboard = () => {
             {errors.nama && <p className="error-text">{errors.nama}</p>}
           </div>
 
+          {/* Universitas & Jurusan */}
           <div className="dashboard-form-row">
             <div className="dashboard-form-group">
               <label htmlFor="universitas">Universitas</label>
@@ -180,6 +183,7 @@ const Dashboard = () => {
               </select>
               {errors.universitas && <p className="error-text">{errors.universitas}</p>}
             </div>
+
             <div className="dashboard-form-group">
               <label htmlFor="jurusan">Jurusan</label>
               <select
@@ -199,23 +203,51 @@ const Dashboard = () => {
             </div>
           </div>
 
+          {/* No. Sertifikat */}
           <div className="dashboard-form-group">
-            <label htmlFor="tanggalTerbit">Tanggal Terbit</label>
+            <label htmlFor="nomerSertifikat">No. Sertifikat</label>
             <input
-              id="tanggalTerbit"
-              name="tanggalTerbit"
-              type="date"
-              value={formData.tanggalTerbit}
+              id="nomerSertifikat"
+              name="nomerSertifikat"
+              value={formData.nomerSertifikat}
               onChange={handleChange}
-              className={`dashboard-input ${errors.tanggalTerbit ? 'input-error' : ''}`}
+              className={`dashboard-input ${errors.nomerSertifikat ? 'input-error' : ''}`}
             />
-            {errors.tanggalTerbit && <p className="error-text">{errors.tanggalTerbit}</p>}
+            {errors.nomerSertifikat && <p className="error-text">{errors.nomerSertifikat}</p>}
           </div>
 
-          {Object.keys(initialFiles).map((key) => (
+          {/* Fakultas & Tahun Lulus */}
+          <div className="dashboard-form-row">
+            <div className="dashboard-form-group">
+              <label htmlFor="fakultas">Fakultas</label>
+              <input
+                id="fakultas"
+                name="fakultas"
+                value={formData.fakultas}
+                onChange={handleChange}
+                className={`dashboard-input ${errors.fakultas ? 'input-error' : ''}`}
+              />
+              {errors.fakultas && <p className="error-text">{errors.fakultas}</p>}
+            </div>
+            <div className="dashboard-form-group">
+              <label htmlFor="tahunLulus">Tahun Lulus</label>
+              <input
+                id="tahunLulus"
+                name="tahunLulus"
+                type="number"
+                value={formData.tahunLulus}
+                onChange={handleChange}
+                className={`dashboard-input ${errors.tahunLulus ? 'input-error' : ''}`}
+              />
+              {errors.tahunLulus && <p className="error-text">{errors.tahunLulus}</p>}
+            </div>
+          </div>
+
+          {/* File Ijazah & SKPI */}
+          {['file_ijazah', 'file_skpi'].map((key) => (
             <div className="dashboard-form-group" key={key}>
               <label htmlFor={key}>
-                {key.replace('pdf_', '').replace(/_/g, ' ').toUpperCase()}
+                {key === 'file_ijazah' ? 'File Ijazah (PDF)' : 'File SKPI (PDF)'}
               </label>
               <input
                 id={key}
@@ -229,6 +261,7 @@ const Dashboard = () => {
             </div>
           ))}
 
+          {/* Confirmation Checkbox */}
           <div className="dashboard-form-group">
             <label className="confirm-label">
               <input
@@ -244,24 +277,21 @@ const Dashboard = () => {
             {errors.confirmed && <p className="error-text">{errors.confirmed}</p>}
           </div>
 
+          {/* Submit Button */}
           <div className="dashboard-form-action">
             <button type="submit" className="dashboard-button">
               Terbitkan Sertifikat
             </button>
           </div>
-        </form>
 
-        {statusMsg && (
-          <div className="dashboard-status">
-            <p
-              className={`status-text ${
-                statusMsg.includes('✅') ? 'success' : statusMsg.includes('❌') ? 'error' : 'info'
-              }`}>
-              {' '}
-              {statusMsg}{' '}
-            </p>
-          </div>
-        )}
+          {statusMsg && (
+            <div className="dashboard-status">
+              <p className={`status-text ${statusMsg.includes('✅') ? 'success' : 'error'}`}>
+                {statusMsg}
+              </p>
+            </div>
+          )}
+        </form>
 
         <div className="dashboard-footer-wrapper">
           <Footer />
