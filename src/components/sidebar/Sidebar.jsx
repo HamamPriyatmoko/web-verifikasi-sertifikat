@@ -1,27 +1,50 @@
 import React from 'react';
-import { useLocation, Link } from 'react-router-dom';
-import './Sidebar.css'; // Ganti file CSS jika perlu
-import { FaUserCircle } from 'react-icons/fa';
+import { useLocation, Link, useNavigate } from 'react-router-dom';
+import './Sidebar.css';
+
+import { FaThLarge, FaListUl, FaCheckCircle, FaUserCircle, FaSignOutAlt } from 'react-icons/fa';
 
 const Sidebar = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const currentPath = location.pathname;
+
+  const navLinks = [
+    { to: '/dashboard', icon: <FaThLarge />, text: 'Terbitkan' },
+    { to: '/daftar', icon: <FaListUl />, text: 'Daftar' },
+    { to: '/verifikasi', icon: <FaCheckCircle />, text: 'Verifikasi' },
+  ];
+
+  const handleLogout = () => {
+    localStorage.removeItem('accessToken');
+    navigate('/login');
+  };
 
   return (
     <div className="sidebar">
-      <div>
+      {/* Bagian atas: Logo dan Navigasi */}
+      <div className="sidebar-main">
         <h1 className="sidebar-logo">B-Verify</h1>
         <div className="sidebar-nav-links">
-          <Link to="/dashboard" className={currentPath === '/dashboard' ? 'active' : ''}>
-            Terbitkan
-          </Link>
-          <Link to="/daftar" className={currentPath === '/daftar' ? 'active' : ''}>
-            Daftar
-          </Link>
-          <Link to="/verifikasi" className={currentPath === '/verifikasi' ? 'active' : ''}>
-            Verifikasi
-          </Link>
+          {navLinks.map((link) => (
+            <Link key={link.to} to={link.to} className={currentPath === link.to ? 'active' : ''}>
+              <span className="nav-icon">{link.icon}</span>
+              {link.text}
+            </Link>
+          ))}
         </div>
+      </div>
+
+      {/* Bagian bawah: Profil dan Logout */}
+      <div className="sidebar-footer">
+        <div className="sidebar-user">
+          <FaUserCircle className="user-icon" />
+          <span className="user-name">Admin</span>
+        </div>
+        <button onClick={handleLogout} className="logout-button">
+          <FaSignOutAlt className="logout-icon" />
+          Logout
+        </button>
       </div>
     </div>
   );

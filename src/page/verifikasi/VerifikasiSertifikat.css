@@ -1,197 +1,105 @@
-/* 1. Container Utama */
 .verifikasi-container {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  background: #f4f7f6;
-  padding: 20px 40px;
+  padding: 2rem;
   box-sizing: border-box;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial,
-    sans-serif;
+  background-color: var(--page-background, #f8f9fa);
 }
 
-/* 2. Main Content Wrapper */
-.verifikasi-main-content {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  flex: 1;
-  width: 100%;
-}
-
-/* 3. Card Konten Utama */
 .verifikasi-content {
-  width: 100%;
-  max-width: 900px;
-  background: #ffffff;
+  max-width: 800px;
+  margin: 0 auto;
+  background: var(--form-background, #ffffff);
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  padding: 30px;
-  margin: 0;
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
+  box-shadow: 0 8px N30px rgba(0, 0, 0, 0.07);
+  padding: 2rem 2.5rem;
+  border: 1px solid #e5e7eb;
 }
 
-/* 4. Judul */
 .verifikasi-title {
-  font-size: 24px;
-  color: #333;
-  margin-bottom: 25px;
-  font-weight: 600;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--brand-dark-blue, #1e3a8a);
   text-align: center;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  margin-bottom: 2rem;
 }
 
-/* 5. Input Hash & Tombol Verifikasi */
+/* -- GRUP INPUT & TOMBOL AKSI -- */
 .verifikasi-input-group {
   display: flex;
-  gap: 10px;
-  align-items: center;
-  width: 100%;
-  margin-bottom: 20px;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
 }
 
 .verifikasi-input-box {
-  padding: 12px 15px;
-  font-size: 14px;
-  border-radius: 6px;
-  border: 1px solid #dfe1e5;
-  width: 100%;
   flex-grow: 1;
-  background-color: #fafbfc;
-  color: #333;
-  outline: none;
-  transition: all 0.2s ease;
+  padding: 0.8rem 1rem;
+  font-size: 1rem;
+  border: 1px solid var(--border-color, #d1d5db);
+  border-radius: 8px;
+  transition: all 0.2s;
 }
-
-.verifikasi-input-box::placeholder {
-  color: #999;
-}
-
 .verifikasi-input-box:focus {
-  border-color: #007bff;
-  background-color: #fff;
-  box-shadow: 0 0 5px rgba(0, 123, 255, 0.2);
+  outline: none;
+  border-color: var(--brand-accent-blue, #2563eb);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
 }
 
-/* 6. Grup Tombol Aksi */
 .verifikasi-button-group {
   display: flex;
   justify-content: center;
-  gap: 15px;
-  margin: 10px 0 20px 0;
-  flex-wrap: wrap;
+  gap: 1rem;
+  padding: 1.5rem 0;
+  border-top: 1px solid #f3f4f6;
+  border-bottom: 1px solid #f3f4f6;
+  margin-top: 2rem;
 }
 
-.verifikasi-camera-btn,
-.verifikasi-pdf-btn {
-  color: white;
-  border: none;
-  padding: 12px 20px;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
+.verifikasi-action-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.2rem;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  font-size: 0.9rem;
+  font-weight: 600;
   cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  transition: all 0.3s ease;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.2s;
 }
-
-.verifikasi-camera-btn {
-  background: #007bff;
+.verifikasi-action-btn.camera {
+  background-color: #f3f4f6;
+  color: #374151;
+  border-color: #d1d5db;
 }
-
-.verifikasi-pdf-btn {
-  background: #17a2b8;
+.verifikasi-action-btn.camera:hover:not(:disabled) {
+  background-color: #e5e7eb;
 }
-
-.verifikasi-camera-btn:hover:not(:disabled) {
-  background: #0056b3;
+.verifikasi-action-btn.pdf {
+  background-color: var(--brand-dark-blue, #1e3a8a);
+  color: white;
 }
-.verifikasi-pdf-btn:hover:not(:disabled) {
-  background: #117a8b;
+.verifikasi-action-btn.pdf:hover:not(:disabled) {
+  background-color: #1e40af;
 }
-
-.verifikasi-camera-btn:disabled,
-.verifikasi-pdf-btn:disabled {
-  background: #ccc;
+.verifikasi-action-btn:disabled {
+  opacity: 0.6;
   cursor: not-allowed;
-  box-shadow: none;
 }
 
-/* 7. Wrapper untuk Scanner & Pilihan Kamera */
-.verifikasi-scanner-wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  margin: 20px 0;
-  padding: 15px;
-  background: #f8f9fa;
-  border-radius: 8px;
+/* -- AREA SCANNER, PREVIEW, DAN HASIL -- */
+.verifikasi-dynamic-area {
+  margin-top: 2rem;
+  min-height: 100px; /* Jaga tinggi agar tidak 'jumpy' */
 }
 
-.verifikasi-scanner-container {
-  position: relative;
-  width: 100%;
-  max-width: 450px;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.verifikasi-scanner {
-  width: 100%;
-  background: #0071da;
-}
-
-.scanner-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  pointer-events: none;
-}
-
-.scanner-line {
-  width: 80%;
-  height: 2px;
-  background: #007bff;
-  box-shadow: 0 0 10px #007bff;
-  animation: scan 2s ease-in-out infinite;
-}
-
-@keyframes scan {
-  0% {
-    transform: translateY(-50px);
-  }
-  50% {
-    transform: translateY(50px);
-  }
-  100% {
-    transform: translateY(-50px);
-  }
-}
-
-/* 8. Kartu Preview Data */
+.verifikasi-scanner-wrapper,
 .verifikasi-preview {
-  margin: 20px 0;
-  width: 100%;
-  background: #f8f9fa;
-  padding: 20px;
+  background-color: #f9fafb;
+  padding: 1.5rem;
   border-radius: 8px;
-  border: 1px solid #e9ecef;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-  animation: fadeIn 0.5s;
+  border: 1px solid #e5e7eb;
+  animation: fadeIn 0.4s ease-out;
 }
+
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -203,100 +111,63 @@
   }
 }
 
-.verifikasi-preview h4 {
-  font-size: 18px;
-  color: #333;
-  margin-top: 0;
-  margin-bottom: 15px;
-  font-weight: 600;
+#reader-container {
+  border-radius: 8px;
+  overflow: hidden;
+  max-width: 400px;
+  margin: 0 auto;
 }
 
-/* 9. Aksi di dalam Kartu Preview */
+.verifikasi-preview h4 {
+  font-size: 1.2rem;
+  color: var(--text-primary, #111827);
+  margin: 0 0 1rem 0;
+}
+
 .verifikasi-preview-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
-  margin-top: 20px;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
 }
 
 .verifikasi-cancel-btn {
-  background: #6c757d;
-  color: white;
-  border: none;
-  padding: 12px 20px;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-.verifikasi-cancel-btn:hover:not(:disabled) {
-  background: #5a6268;
-}
-
-/* 10. Tabel Data Terstruktur */
-.verifikasi-data-table {
-  width: 100%;
-  border: 1px solid #dfe1e5;
-  border-radius: 6px;
-  background: #fff;
-  padding: 15px;
-  margin: 10px 0;
-  box-sizing: border-box;
-}
-
-.verifikasi-data-row {
   display: flex;
-  justify-content: space-between;
-  padding: 10px 0;
-  border-bottom: 1px solid #f1f1f1;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.2rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  background-color: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
+}
+.verifikasi-cancel-btn:hover {
+  background-color: #e5e7eb;
 }
 
-.verifikasi-data-row:last-child {
-  border-bottom: none;
-}
-
-.verifikasi-data-label {
-  font-weight: 500;
-  color: #333;
-  flex: 1;
-}
-
-.verifikasi-data-value {
-  color: #555;
-  flex: 2;
-  text-align: left;
-  word-break: break-word;
-}
-
-/* 11. Pesan Error / Status Awal */
 .verifikasi-result {
-  width: 100%;
-  margin: 20px 0;
-  text-align: center;
+  margin-top: 2rem;
 }
-
 .verifikasi-error {
-  color: #721c24;
-  font-size: 16px;
-  background-color: #f8d7da;
-  border: 1px solid #f5c6cb;
-  padding: 12px;
-  border-radius: 6px;
-  margin-bottom: 20px;
-}
-
-.verifikasi-empty {
-  color: #666;
-  font-size: 14px;
+  color: #b91c1c;
+  background-color: #fee2e2;
+  padding: 1rem;
+  border-radius: 8px;
   text-align: center;
-  padding: 20px;
-  background: #f8f9fa;
+}
+.verifikasi-empty {
+  color: #6b7280;
+  text-align: center;
+  padding: 2rem;
+  background-color: #f9fafb;
   border-radius: 8px;
 }
 
-/* 12. Modal Hasil Verifikasi */
+/* -- MODAL HASIL VERIFIKASI -- */
 .verifikasi-modal-overlay {
   position: fixed;
   top: 0;
@@ -309,140 +180,155 @@
   align-items: center;
   z-index: 1000;
   padding: 20px;
+  backdrop-filter: blur(5px);
 }
 
 .verifikasi-modal {
   background: #fff;
   border-radius: 12px;
-  padding: 30px;
+  padding: 0;
   width: 90%;
   max-width: 800px;
   max-height: 90vh;
-  overflow-y: auto;
+  overflow: hidden;
   box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
-  position: relative;
-  box-sizing: border-box;
-}
-
-.verifikasi-modal h3 {
-  font-size: 20px;
-  color: #28a745;
-  margin-bottom: 20px;
-  font-weight: 600;
-  text-align: center;
-}
-.verifikasi-modal h4 {
-  margin-top: 25px;
-  margin-bottom: 10px;
-  font-size: 16px;
-  color: #007bff;
-  border-bottom: 2px solid #007bff;
-  padding-bottom: 5px;
-  display: inline-block;
-}
-
-.verifikasi-modal-content {
-  margin-bottom: 20px;
-}
-
-/* Grup Tombol Download */
-.verifikasi-download-group {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: center;
-  margin: 20px 0;
+  flex-direction: column;
 }
 
-.verifikasi-download-btn {
-  background: #28a745;
+.verifikasi-modal-header {
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.verifikasi-modal-header h3 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  font-size: 1.5rem;
+  color: #166534; /* Hijau sukses */
+  margin: 0;
+}
+
+.verifikasi-modal-body {
+  padding: 1.5rem 2rem;
+  overflow-y: auto;
+}
+
+.verifikasi-modal-tabs {
+  display: flex;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 1.5rem;
+}
+
+.verifikasi-modal-tab {
+  padding: 0.75rem 1.25rem;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px; /* Agar border bawah menyatu */
+  color: #6b7280;
+  font-weight: 500;
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+}
+.verifikasi-modal-tab.active {
+  color: var(--brand-accent-blue, #2563eb);
+  border-color: var(--brand-accent-blue, #2563eb);
+  font-weight: 600;
+}
+.verifikasi-modal-tab-content {
+  display: none;
+}
+.verifikasi-modal-tab-content.active {
+  display: block;
+  animation: fadeIn 0.4s;
+}
+
+/* -- TABEL DATA DI MODAL -- */
+.verifikasi-data-table {
+  display: grid;
+  grid-template-columns: 200px 1fr; /* Kolom label lebih kecil */
+  gap: 1rem;
+}
+.verifikasi-data-label {
+  font-weight: 600;
+  color: #374151;
+}
+.verifikasi-data-value {
+  color: #4b5563;
+  word-break: break-all;
+  font-family: 'Courier New', Courier, monospace;
+}
+
+/* -- TOMBOL DOWNLOAD & TUTUP -- */
+.verifikasi-download-group {
+  margin-top: 2rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.verifikasi-modal-footer {
+  padding: 1.5rem 2rem;
+  border-top: 1px solid #e5e7eb;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.verifikasi-modal-close-btn {
+  background: var(--brand-accent-blue);
   color: white;
   border: none;
-  padding: 10px 15px;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
+  padding: 0.7rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
   cursor: pointer;
-  transition: background 0.3s ease;
 }
 
-.verifikasi-download-group button,
-.verifikasi-download-group a {
+.verifikasi-input-group button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 150px;
-  padding: 12px 30px;
-  color: #007bff;
-  background-color: #e7f3ff;
-  border: 1px solid #007bff;
-  border-radius: 8px;
-  box-shadow: 0 4px 15px rgba(0, 123, 255, 0.1);
-  font-weight: 600;
-  text-decoration: none;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.verifikasi-download-group button:hover:not(:disabled),
-.verifikasi-download-group a:hover:not(:disabled) {
-  background-color: #d0e7ff;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 123, 255, 0.15);
-}
-
-.verifikasi-download-btn:hover {
-  background: #218838;
-}
-
-/* Tombol Tutup Modal */
-.verifikasi-modal-close-btn {
-  background: #dc3545;
-  color: white;
+  padding: 0.8rem 1.5rem;
   border: none;
-  padding: 12px 25px;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
   cursor: pointer;
-  display: block;
-  margin: 20px auto 0 auto;
-  transition: background 0.3s ease;
+  transition: all 0.2s ease-in-out;
+  flex-shrink: 0; /* Mencegah tombol menyusut jika ruang sempit */
+
+  /* Menggunakan variabel warna dari tema utama kita */
+  background-color: var(--brand-accent-blue, #2563eb);
+  color: var(--text-on-dark, #ffffff);
 }
 
-.verifikasi-modal-close-btn:hover {
-  background: #c82333;
+.verifikasi-input-group button:hover:not(:disabled) {
+  background-color: var(--brand-accent-hover, #1d4ed8);
+  transform: translateY(-1px);
 }
 
-.verifikasi-verify-btn {
-  background: #007bff;
-  color: white;
+.verifikasi-input-group button:disabled {
+  background-color: #9ca3af; /* Warna abu-abu saat disabled */
+  cursor: not-allowed;
+  transform: none;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-  .verifikasi-container {
-    padding: 15px;
+/* Style untuk ikon spinner saat loading */
+.verifikasi-input-group button .spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
   }
-  .verifikasi-content {
-    padding: 20px;
-  }
-  .verifikasi-title {
-    font-size: 20px;
-  }
-  .verifikasi-input-group,
-  .verifikasi-button-group,
-  .verifikasi-preview-actions {
-    flex-direction: column;
-    gap: 10px;
-    align-items: stretch;
-  }
-  .verifikasi-data-row {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 5px;
-  }
-  .verifikasi-data-value {
-    text-align: left;
+  to {
+    transform: rotate(360deg);
   }
 }

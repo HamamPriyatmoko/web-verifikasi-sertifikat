@@ -1,128 +1,170 @@
-// src/pages/DaftarSertifikat.js
-import React, { useState, useEffect } from 'react';
-import './DaftarSertifikat.css';
-import { FaSearch } from 'react-icons/fa';
-import Footer from '../../components/Footer';
-import DownloadPdfButton from '../../components/downloadpdf/DownloadPdfButton';
+// src/page/daftarsertifikat/DaftarSertifikat.jsx (Versi Final dengan Dropdown)
 
-const DaftarSertifikat = () => {
+import React, { useState, useEffect, useMemo } from 'react';
+import { FaSearch, FaDownload } from 'react-icons/fa';
+import { AiOutlineLoading } from 'react-icons/ai';
+import { useDebounce } from '../../utils/useDebounce';
+import './DaftarSertifikat.css';
+import DownloadPdfButton from '../../components/ButtonDownload/DownloadPdfButton'; // Pastikan path ini benar
+
+const API_BASE = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000';
+
+export default function DaftarSertifikat() {
   const [allData, setAllData] = useState([]);
-  const [filteredData, setFilteredData] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [itemsPerPage, setItemsPerPage] = useState(10); // State ini sekarang akan terpakai
+  const [loading, setLoading] = useState(true);
 
-  // 1) Ambil semua data sertifikat
+  // Gunakan debounce untuk menunda filtering saat pengguna mengetik
+  const debouncedSearchTerm = useDebounce(searchTerm, 500);
+
   useEffect(() => {
-    fetch('http://127.0.0.1:5000/api/sertifikat')
-      .then((res) => res.json())
-      .then(({ sertifikat = [] }) => {
+    const fetchData = async () => {
+      setLoading(true);
+      try {
+        const res = await fetch(`${API_BASE}/api/sertifikat`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const { sertifikat = [] } = await res.json();
         setAllData(sertifikat);
-        setFilteredData(sertifikat);
-      })
-      .catch(console.error);
+      } catch (err) {
+        console.error('❌ fetch error:', err);
+        alert('Gagal memuat daftar sertifikat:\n' + err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchData();
   }, []);
 
-  // 2) Search/filter by nim atau universitas
-  const handleSearch = (e) => {
-    const term = e.target.value;
-    setSearchTerm(term);
-    const lower = term.toLowerCase();
-    setFilteredData(
-      allData.filter(
-        (item) =>
-          item.nim.toLowerCase().includes(lower) ||
-          (item.universitas || '').toLowerCase().includes(lower),
-      ),
+  // Gunakan useMemo agar filtering hanya berjalan jika data atau search term berubah
+  const filteredData = useMemo(() => {
+    setCurrentPage(1); // Kembali ke halaman 1 setiap kali filter berubah
+    if (!debouncedSearchTerm) return allData;
+    const lower = debouncedSearchTerm.toLowerCase();
+    return allData.filter(
+      (item) =>
+        item.nim.toLowerCase().includes(lower) ||
+        (item.universitas || '').toLowerCase().includes(lower),
     );
-    setCurrentPage(1);
+  }, [allData, debouncedSearchTerm]);
+
+  // Kalkulasi untuk pagination
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const firstIdx = (currentPage - 1) * itemsPerPage;
+  const currentItems = filteredData.slice(firstIdx, firstIdx + itemsPerPage);
+
+  // Handler untuk paginasi
+  const handlePageChange = (pageNumber) => {
+    if (pageNumber < 1 || pageNumber > totalPages) return;
+    setCurrentPage(pageNumber);
   };
 
-  // 3) Pagination
-  const lastIdx = currentPage * itemsPerPage;
-  const firstIdx = lastIdx - itemsPerPage;
-  const currentItems = filteredData.slice(firstIdx, lastIdx);
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  if (loading) {
+    return (
+      <div className="ds-loading">
+        <AiOutlineLoading className="ds-spinner" />
+      </div>
+    );
+  }
 
   return (
-    <div id="daftar-page">
-      <div className="ds-wrapper">
-        <main className="ds-container">
-          <div className="ds-header">
-            <h2 className="ds-heading">Daftar Sertifikat</h2>
-            <div className="ds-header-actions">
-              <div className="ds-search-container">
-                <FaSearch className="ds-search-icon" />
-                <input
-                  type="text"
-                  className="ds-search-bar"
-                  placeholder="Cari NIM atau universitas"
-                  value={searchTerm}
-                  onChange={handleSearch}
-                />
-              </div>
-              <select
-                className="ds-items-per-page"
-                value={itemsPerPage}
-                onChange={(e) => {
-                  setItemsPerPage(Number(e.target.value));
-                  setCurrentPage(1);
-                }}>
-                <option value={5}>5 per halaman</option>
-                <option value={10}>10 per halaman</option>
-                <option value={15}>15 per halaman</option>
-              </select>
+    <div className="ds-container">
+      <div className="ds-card">
+        <header className="ds-header">
+          <h2 className="ds-heading">Daftar Sertifikat</h2>
+          <div className="ds-header-actions">
+            <div className="ds-search-container">
+              <FaSearch className="ds-search-icon" />
+              <input
+                type="text"
+                className="ds-search-bar"
+                placeholder="Cari NIM atau universitas..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
-          </div>
 
+            {/* ELEMEN DROPDOWN YANG DITAMBAHKAN KEMBALI */}
+            <select
+              className="ds-items-per-page"
+              value={itemsPerPage}
+              onChange={(e) => {
+                setItemsPerPage(Number(e.target.value));
+                setCurrentPage(1); // Kembali ke halaman 1 saat item diubah
+              }}>
+              <option value={10}>10 per halaman</option>
+              <option value={20}>20 per halaman</option>
+              <option value={50}>50 per halaman</option>
+            </select>
+          </div>
+        </header>
+
+        <div className="ds-table-wrapper">
           <table className="ds-daftar-table">
             <thead>
               <tr>
                 <th>NIM</th>
                 <th>Universitas</th>
-                <th>Action</th>
+                <th style={{ textAlign: 'center' }}>Action</th>
               </tr>
             </thead>
             <tbody>
-              {currentItems.map((item) => (
-                <tr key={item.id}>
-                  <td>{item.nim}</td>
-                  <td>{item.universitas || '-'}</td>
-                  <td>
-                    <DownloadPdfButton
-                      nim={item.nim}
-                      className="ds-action-btn ds-download-btn"
-                      label="Download PDF"
-                    />
-                  </td>
-                </tr>
-              ))}
-              {currentItems.length === 0 && (
+              {currentItems.length > 0 ? (
+                currentItems.map((item) => (
+                  <tr key={item.id}>
+                    <td>{item.nim}</td>
+                    <td>{item.universitas || '-'}</td>
+                    <td style={{ textAlign: 'center' }}>
+                      <DownloadPdfButton
+                        nim={item.nim}
+                        className="ds-action-btn"
+                        label={
+                          <>
+                            <FaDownload size={12} />
+                            <span>Download</span>
+                          </>
+                        }
+                      />
+                    </td>
+                  </tr>
+                ))
+              ) : (
                 <tr>
-                  <td colSpan={3} style={{ textAlign: 'center', padding: '1rem' }}>
-                    Tidak ada data.
+                  <td colSpan={3} style={{ textAlign: 'center', padding: '2rem' }}>
+                    Tidak ada data yang cocok.
                   </td>
                 </tr>
               )}
             </tbody>
           </table>
+        </div>
 
-          {/* Pagination controls */}
-          <div className="ds-pagination">
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((num) => (
+        <footer className="ds-pagination-footer">
+          <span>
+            Menampilkan <strong>{currentItems.length}</strong> dari{' '}
+            <strong>{filteredData.length}</strong> data
+          </span>
+          {totalPages > 1 && (
+            <div className="ds-pagination-controls">
               <button
-                key={num}
-                className={`ds-page-btn ${currentPage === num ? 'ds-active' : ''}`}
-                onClick={() => setCurrentPage(num)}>
-                {num}
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}>
+                Previous
               </button>
-            ))}
-          </div>
-        </main>
-        <Footer />
+              <span>
+                {' '}
+                Halaman <strong>{currentPage}</strong> dari <strong>{totalPages}</strong>{' '}
+              </span>
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}>
+                Next
+              </button>
+            </div>
+          )}
+        </footer>
       </div>
     </div>
   );
-};
-
-export default DaftarSertifikat;
+}

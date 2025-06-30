@@ -1,0 +1,355 @@
+[
+  {
+    "inputs": [],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "bytes32",
+        "name": "id",
+        "type": "bytes32"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "nim",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "universitas",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "cidDetail",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "nomerSertifikat",
+        "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "string",
+        "name": "hashMetadata",
+        "type": "string"
+      }
+    ],
+    "name": "SertifikatDiterbitkan",
+    "type": "event"
+  },
+  {
+    "inputs": [],
+    "name": "admin",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "allIds",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "name": "daftarSertifikat",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "id",
+        "type": "bytes32"
+      },
+      {
+        "internalType": "string",
+        "name": "nim",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "universitas",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "cidDetail",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "hashMetadata",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "nomerSertifikat",
+        "type": "string"
+      },
+      {
+        "internalType": "uint256",
+        "name": "blockNumber",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "name": "idByHashMetadata",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "name": "idByNIM",
+    "outputs": [
+      {
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_adminBaru",
+        "type": "address"
+      }
+    ],
+    "name": "ubahAdmin",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "string",
+            "name": "nim",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "universitas",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "cidDetail",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "hashMetadata",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "nomerSertifikat",
+            "type": "string"
+          }
+        ],
+        "internalType": "struct BlockchainSertifikasi.SertifikatInput",
+        "name": "_input",
+        "type": "tuple"
+      }
+    ],
+    "name": "terbitkanSertifikat",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "getAllId",
+    "outputs": [
+      {
+        "internalType": "bytes32[]",
+        "name": "",
+        "type": "bytes32[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "bytes32",
+        "name": "id",
+        "type": "bytes32"
+      }
+    ],
+    "name": "getSertifikatById",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "bytes32",
+            "name": "id",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "string",
+            "name": "nim",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "universitas",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "cidDetail",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "hashMetadata",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "nomerSertifikat",
+            "type": "string"
+          },
+          {
+            "internalType": "uint256",
+            "name": "blockNumber",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct BlockchainSertifikasi.Sertifikat",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "_hashMetadata",
+        "type": "string"
+      }
+    ],
+    "name": "getSertifikatByHash",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "bytes32",
+            "name": "id",
+            "type": "bytes32"
+          },
+          {
+            "internalType": "string",
+            "name": "nim",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "universitas",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "cidDetail",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "hashMetadata",
+            "type": "string"
+          },
+          {
+            "internalType": "string",
+            "name": "nomerSertifikat",
+            "type": "string"
+          },
+          {
+            "internalType": "uint256",
+            "name": "blockNumber",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct BlockchainSertifikasi.Sertifikat",
+        "name": "",
+        "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function",
+    "constant": true
+  }
+]

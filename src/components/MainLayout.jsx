@@ -1,5 +1,5 @@
 import React from 'react';
-import Sidebar from './sidebar/Sidebar';
+import Sidebar from './Sidebar/Sidebar';
 import { Outlet, useLocation } from 'react-router-dom';
 import './MainLayout.css'; // Add a CSS file for MainLayout
 

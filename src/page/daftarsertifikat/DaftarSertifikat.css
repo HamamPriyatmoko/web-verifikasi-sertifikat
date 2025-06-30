@@ -1,274 +1,201 @@
-/* --- Root container untuk halaman Daftar Sertifikat --- */
-#daftar-page {
-  background-color: #e8f0fe;
-  min-height: 100vh;
-  margin: 0;
+/* src/page/daftarsertifikat/DaftarSertifikat.css (Versi Baru Lengkap) */
+
+.ds-loading {
+  height: calc(100vh - 80px); /* Sesuaikan jika header punya tinggi berbeda */
   display: flex;
-  font-family: Arial, sans-serif;
+  justify-content: center;
+  align-items: center;
+}
+.ds-spinner {
+  font-size: 2.5rem;
+  color: var(--brand-accent-blue, #2563eb);
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-/* --- Wrapper yang berada di dalam MainLayout --- */
-.ds-wrapper {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  width: 100%;
-  /* Hilangkan margin-left: 250px; karena MainLayout sudah menambah offset sidebar */
-}
-
-/* --- Container utama (kartu putih) --- */
 .ds-container {
-  width: 100%;
-  padding: 30px 40px;
-  box-sizing: border-box;
-  background: #ffffff;
-  border-radius: 12px 12px 0 0; /* Rounded top corners saja */
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
-  flex-grow: 1; /* Membuat area table dan footer mendorong hingga bawah */
+  padding: 2rem;
+  background-color: var(--page-background, #f8f9fa);
 }
 
-/* --- Header daftar sertifikat --- */
+.ds-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  border: 1px solid #e5e7eb;
+  overflow: hidden; /* Penting untuk rounded corner di tabel */
+}
+
+/* --- Header --- */
 .ds-header {
+  padding: 1.5rem 2rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
-  background: linear-gradient(90deg, #007bff, #0056b3);
-  padding: 15px 20px;
-  border-radius: 10px 10px 0 0; /* Rounded top corners saja */
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  flex-wrap: wrap;
+  gap: 1rem;
+  border-bottom: 1px solid #e5e7eb;
 }
 
 .ds-heading {
-  font-size: 24px;
+  font-size: 1.5rem;
   font-weight: 700;
-  color: #ffffff;
-  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+  color: var(--brand-dark-blue, #1e3a8a);
+  margin: 0;
 }
 
 .ds-header-actions {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 1rem;
 }
 
-/* --- Kotak Pencarian --- */
 .ds-search-container {
-  display: flex;
-  align-items: center;
-  background: #ffffff;
-  border-radius: 5px;
-  padding: 5px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  position: relative;
 }
 
 .ds-search-icon {
-  margin-right: 8px;
-  font-size: 16px;
-  color: #007bff;
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
 }
 
 .ds-search-bar {
-  padding: 6px 10px;
-  font-size: 14px;
-  width: 200px;
-  border: none;
+  padding: 0.6rem 1rem 0.6rem 2.5rem; /* Ruang untuk ikon */
+  width: 250px;
+  border: 1px solid var(--border-color, #d1d5db);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+.ds-search-bar:focus {
   outline: none;
-  background: transparent;
+  border-color: var(--brand-accent-blue, #2563eb);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
 }
 
-/* --- Dropdown untuk Items per page --- */
 .ds-items-per-page {
-  padding: 6px 10px;
-  font-size: 14px;
-  border: none;
-  outline: none;
-  background: #ffffff;
-  border-radius: 5px;
-  color: #333;
-  cursor: pointer;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-color, #d1d5db);
+  background-color: white;
+  font-size: 0.9rem;
 }
 
-/* --- Tabel Daftar Sertifikat --- */
+/* --- Tabel --- */
+.ds-table-wrapper {
+  overflow-x: auto; /* Scroll horizontal di layar kecil */
+}
+
 .ds-daftar-table {
   width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  font-size: 14px;
-  border-radius: 0 0 10px 10px; /* Rounded bottom corners saja */
-  overflow: hidden;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-collapse: collapse;
 }
 
 .ds-daftar-table th,
 .ds-daftar-table td {
-  padding: 12px 15px;
-  text-align: center;
-  transition: all 0.3s ease;
+  padding: 1rem 1.5rem;
+  text-align: left;
+  border-bottom: 1px solid #e5e7eb;
+  white-space: nowrap; /* Mencegah teks wrap */
 }
 
 .ds-daftar-table th {
-  background: linear-gradient(90deg, #007bff, #0056b3);
-  color: #ffffff;
-  font-weight: 600;
+  background-color: #f9fafb;
+  color: #4b5563;
+  font-size: 0.8rem;
   text-transform: uppercase;
-  border-bottom: 2px solid #0056b3;
+  letter-spacing: 0.05em;
+  font-weight: 600;
 }
 
-.ds-daftar-table tr {
-  background-color: #ffffff;
-  border-bottom: 1px solid #e0e0e0;
+.ds-daftar-table tbody tr:hover {
+  background-color: #f9fafb;
 }
 
-.ds-daftar-table tr:last-child {
-  border-bottom: none;
+.ds-daftar-table td {
+  color: #374151;
 }
 
-.ds-daftar-table tr:hover {
-  background-color: #f0f7ff;
-}
-
-/* --- Avatar/Foto user (Inisial) --- */
-.ds-user-photo {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background-color: #007bff;
-  color: #ffffff;
-  display: flex;
+.ds-action-btn {
+  /* Menggunakan style dari tombol Verifikasi */
+  display: inline-flex;
   align-items: center;
   justify-content: center;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-size: 0.85rem;
   font-weight: 600;
-  margin: 0 auto;
-}
-
-/* --- Tombol Aksi (Download PDF) --- */
-.ds-action-btn {
-  padding: 6px 12px;
-  border: none;
-  border-radius: 5px;
   cursor: pointer;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  font-size: 12px;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  margin: 0 auto;
+  transition: all 0.2s;
+  background-color: var(--brand-accent-blue, #2563eb);
+  color: white;
+  border: none;
 }
-
-.ds-download-btn {
-  background: linear-gradient(90deg, #4caf50, #2e7d32); /* Hijau untuk "Download PDF" */
-  color: #ffffff;
-}
-
-.ds-action-btn:hover {
-  filter: brightness(1.1);
-  transform: translateY(-1px);
+.ds-action-btn:hover:not(:disabled) {
+  background-color: var(--brand-accent-hover, #1d4ed8);
 }
 
 /* --- Pagination --- */
-.ds-pagination {
-  margin-top: 20px;
-  text-align: center;
-  padding: 10px;
-  background: #ffffff;
-  border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+.ds-pagination-footer {
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #6b7280;
+  font-size: 0.9rem;
+  flex-wrap: wrap;
+  gap: 1rem;
 }
 
-.ds-page-btn {
-  padding: 6px 12px;
-  margin: 0 5px;
-  border: none;
-  background: #007bff;
-  color: #ffffff;
-  border-radius: 5px;
+.ds-pagination-controls button {
+  padding: 0.5rem 1rem;
+  margin: 0 0.25rem;
+  border: 1px solid #d1d5db;
+  background: white;
+  color: #374151;
+  border-radius: 8px;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s;
 }
 
-.ds-page-btn.ds-active {
-  background: #0056b3;
-  transform: scale(1.1);
+.ds-pagination-controls button:hover:not(:disabled) {
+  background-color: #f3f4f6;
+  border-color: #9ca3af;
 }
 
-.ds-page-btn:hover {
-  background: #0056b3;
-  transform: scale(1.05);
+.ds-pagination-controls button.active {
+  background-color: var(--brand-accent-blue, #2563eb);
+  border-color: var(--brand-accent-blue, #2563eb);
+  color: white;
+  font-weight: 600;
 }
 
-/* --- Pesan Status (Jika diperlukan) --- */
-.ds-status-message {
-  margin-top: 20px;
-  font-size: 14px;
-  font-weight: 500;
-  color: #2e7d32;
-  background: #e8f5e9;
-  padding: 10px;
-  border-radius: 5px;
-  text-align: center;
+.ds-pagination-controls button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
-/* --- Footer --- */
-footer {
-  background: #f0f0f0;
-  padding: 10px;
-  text-align: center;
-  color: #666;
-  font-size: 12px;
-  margin-top: auto; /* Push footer selalu di bawah */
-}
-
-/* --- Responsive untuk layar kecil (<= 768px) --- */
 @media (max-width: 768px) {
-  /* Hilangkan margin-left karena sudah tidak ada */
-  .ds-wrapper {
-    margin-left: 0;
-  }
-
   .ds-container {
-    padding: 15px;
-    width: 100%;
+    padding: 1rem;
   }
-
   .ds-header {
     flex-direction: column;
-    gap: 15px;
-    padding: 10px;
+    align-items: stretch;
   }
-
-  .ds-daftar-table {
-    display: block;
-    overflow-x: auto;
+  .ds-search-bar {
+    width: 100%;
+    box-sizing: border-box;
   }
-
-  .ds-daftar-table th,
-  .ds-daftar-table td {
-    min-width: 120px;
-    padding: 8px;
-  }
-
-  .ds-daftar-table tr {
-    display: flex;
+  .ds-pagination-footer {
     flex-direction: column;
-    border-bottom: 1px solid #e0e0e0;
-  }
-
-  .ds-daftar-table td {
-    margin: 5px 0;
-  }
-
-  .ds-action-btn {
-    margin: 5px 0;
-    width: 100%;
-  }
-
-  footer {
-    width: 100%;
-    margin-left: 0;
+    gap: 1rem;
   }
 }

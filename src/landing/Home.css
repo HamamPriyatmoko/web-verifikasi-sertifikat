@@ -1,395 +1,165 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto+Slab:wght@700&display=swap');
+/* src/landing/Home.css (Versi Baru & Profesional) */
 
-body {
-  margin: 0;
-  font-family: 'Poppins', sans-serif;
-  background-color: #ffffff;
-  color: #333;
+/* -- FONT & DASAR -- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+.home-page {
+  font-family: 'Inter', sans-serif;
+  background-color: #f9fafb; /* Latar abu-abu sangat terang */
+  color: #111827;
 }
 
-/* Block Utama */
-.b-verify {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-
-/* Element: Navbar */
-.b-verify__navbar {
+/* -- NAVBAR -- */
+.home-navbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #007bff;
   padding: 1rem 5%;
-  color: white;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  background-color: white;
+  border-bottom: 1px solid #e5e7eb;
 }
 
-.b-verify__brand {
-  font-size: 1.8rem;
+.home-brand {
+  font-size: 1.5rem;
   font-weight: 700;
-  font-family: 'Roboto Slab', serif;
-}
-
-.b-verify__nav-links a {
-  color: white;
+  color: var(--brand-dark-blue, #1e3a8a);
   text-decoration: none;
-  margin-left: 25px;
-  font-size: 1rem;
-  font-weight: 500;
 }
 
-/* Element: Konten Utama */
-.b-verify__main-content {
-  flex-grow: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  text-align: center;
-  padding: 20px;
-}
-
-.b-verify__container {
-  width: 100%;
-  max-width: 550px;
-}
-
-.b-verify__title {
-  font-size: 2.5rem;
-  font-weight: 700;
-  margin-bottom: 10px;
-  color: #212529;
-}
-
-.b-verify__subtitle {
-  font-size: 1.1rem;
-  color: #6c757d;
-  margin-bottom: 40px;
-}
-
-/* Element: Grup Input */
-.b-verify__input-group {
-  display: flex;
-  margin-bottom: 1rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  border-radius: 8px;
-}
-
-.b-verify__input {
-  flex-grow: 1;
-  border: 1px solid #ced4da;
-  border-right: none;
-  padding: 12px 15px;
-  font-size: 1rem;
-  border-radius: 8px 0 0 8px;
-  outline: none;
-  transition: border-color 0.2s;
-}
-
-.b-verify__input:focus {
-  border-color: #80bdff;
-  z-index: 1;
-}
-
-/* Element: Tombol */
-.b-verify__button {
-  border: none;
-  background-color: #e9ecef;
-  color: #495057;
-  padding: 0 30px;
-  font-size: 1rem;
+.home-nav-link {
   font-weight: 600;
-  cursor: pointer;
-  border-radius: 0 8px 8px 0;
-  transition: background-color 0.2s;
-}
-.b-verify__button:hover {
-  background-color: #dee2e6;
-}
-.b-verify__button:disabled {
-  cursor: not-allowed;
-  opacity: 0.7;
-}
-
-/* Modifier: Tombol Scan Primary */
-.b-verify__button--primary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: auto;
-  min-width: 150px;
-  padding: 12px 30px;
+  text-decoration: none;
+  background-color: var(--brand-accent-blue, #2563eb);
   color: white;
-  background-color: #007bff;
+  padding: 0.6rem 1.2rem;
   border-radius: 8px;
-  box-shadow: 0 4px 15px rgba(0, 123, 255, 0.2);
   transition: all 0.2s;
 }
-
-.b-verify__button--primary:hover:not(:disabled) {
-  background-color: #0056b3;
+.home-nav-link:hover {
+  background-color: var(--brand-accent-hover, #1d4ed8);
   transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 123, 255, 0.3);
+  box-shadow: 0 4px 15px rgba(37, 99, 235, 0.2);
 }
 
-.b-verify__button--primary:disabled {
-  background-color: #5a9ee4;
+/* -- HERO SECTION (Bagian Atas) -- */
+.home-hero {
+  text-align: center;
+  padding: 4rem 1.5rem;
+  background-color: white;
+}
+
+.home-title {
+  font-size: 2.8rem;
+  font-weight: 700;
+  color: #111827;
+  margin: 0;
+}
+.home-title span {
+  color: var(--brand-accent-blue, #2563eb);
+}
+
+.home-subtitle {
+  font-size: 1.1rem;
+  color: #6b7280;
+  margin-top: 1rem;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* -- KARTU VERIFIKASI -- */
+.verification-card {
+  max-width: 700px;
+  margin: -2rem auto 4rem auto; /* Efek kartu menumpuk di atas hero */
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+  padding: 2.5rem;
+  position: relative;
+  z-index: 10;
+}
+
+.input-group {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.verification-input {
+  flex-grow: 1;
+  padding: 0.8rem 1rem;
+  font-size: 1rem;
+  border: 1px solid var(--border-color, #d1d5db);
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+.verification-input:focus {
+  outline: none;
+  border-color: var(--brand-accent-blue, #2563eb);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #f3f4f6;
+}
+
+.action-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1.2rem;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.action-btn.primary {
+  background-color: var(--brand-accent-blue, #2563eb);
+  color: white;
+}
+.action-btn.primary:hover:not(:disabled) {
+  background-color: var(--brand-accent-hover, #1d4ed8);
+}
+.action-btn.secondary {
+  background-color: #f3f4f6;
+  color: #374151;
+  border-color: #d1d5db;
+}
+.action-btn.secondary:hover:not(:disabled) {
+  background-color: #e5e7eb;
+}
+.action-btn:disabled {
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
-/* Element: Lainnya */
-.b-verify__reader {
-  width: 100%;
+/* -- SCANNER & LOADING -- */
+.scanner-container,
+.loading-container {
+  padding: 2rem 0;
+  text-align: center;
+  color: #6b7280;
+  font-weight: 500;
+}
+#reader-container {
   max-width: 350px;
-  margin: 20px auto 0 auto;
+  margin: 1rem auto 0 auto;
   border-radius: 8px;
   overflow: hidden;
-  border: 1px solid #eee;
 }
 
-.b-verify__loading-text {
-  margin-top: 20px;
-  font-weight: 500;
-  color: #555;
-}
-
-/* --- STYLING MODAL --- */
-.b-verify__modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  padding: 20px;
-  animation: fadeIn 0.3s ease-out;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-.b-verify__modal {
-  background: #ffffff;
-  border-radius: 12px;
-  padding: 30px 40px;
-  width: 90%;
-  max-width: 900px;
-  max-height: 90vh;
-  overflow-y: auto;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  position: relative;
-  animation: slideIn 0.4s ease-out;
-}
-
-@keyframes slideIn {
-  from {
-    transform: translateY(-30px) scale(0.98);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0) scale(1);
-    opacity: 1;
-  }
-}
-
-.b-verify__modal-close {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  background: transparent;
-  border: none;
-  font-size: 28px;
-  cursor: pointer;
-  color: #aaa;
-  line-height: 1;
-  transition: color 0.2s, transform 0.2s;
-}
-.b-verify__modal-close:hover {
-  color: #333;
-  transform: rotate(90deg);
-}
-
-.b-verify__modal-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+/* -- FOOTER -- */
+.home-footer {
   text-align: center;
-  margin-bottom: 25px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid #eee;
-}
-
-.b-verify__modal-title {
-  font-size: 22px;
-  font-weight: 700;
-  margin: 0;
-}
-.b-verify__modal-title.status--valid {
-  color: #28a745;
-}
-.b-verify__modal-title.status--invalid {
-  color: #dc3545;
-}
-.b-verify__result-icon {
-  margin-right: 15px;
-  font-size: 28px;
-}
-.b-verify__result-icon--valid {
-  color: #28a745;
-}
-.b-verify__result-icon--invalid {
-  color: #dc3545;
-}
-
-.b-verify__modal-content h4 {
-  font-size: 16px;
-  font-weight: 600;
-  color: #007bff;
-  margin-top: 20px;
-  margin-bottom: 15px;
-  border-bottom: 2px solid #007bff;
-  padding-bottom: 8px;
-  display: inline-block;
-}
-
-.b-verify__data-table {
-  width: 100%;
-}
-.b-verify__data-row {
-  display: grid;
-  grid-template-columns: 220px 1fr;
-  gap: 15px;
-  padding: 10px 0;
-  border-bottom: 1px solid #f0f0f0;
-}
-.b-verify__data-row:last-child {
-  border-bottom: none;
-}
-.b-verify__data-label {
-  font-weight: 600;
-  color: #333;
-}
-.b-verify__data-value {
-  color: #555;
-  word-break: break-all;
-}
-.b-verify__data-value a {
-  color: #007bff;
-  text-decoration: none;
-  font-weight: 500;
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-}
-.b-verify__data-value a:hover {
-  text-decoration: underline;
-}
-.b-verify__data-row.hash .b-verify__data-value {
-  font-family: 'Courier New', Courier, monospace;
-  background-color: #f8f9fa;
-  padding: 5px 8px;
-  border-radius: 4px;
-  font-size: 14px;
-}
-
-/* --- CSS BARU UNTUK FITUR VERIFIKASI PDF --- */
-
-/* Element: Grup Tombol Aksi */
-.b-verify__actions {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin-top: 1rem;
-}
-
-/* Modifier: Tombol Sekunder (untuk PDF) */
-.b-verify__button--secondary {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: auto;
-  min-width: 150px;
-  padding: 12px 30px;
-  color: #007bff;
-  background-color: #e7f3ff;
-  border: 1px solid #007bff;
-  border-radius: 8px;
-  box-shadow: 0 4px 15px rgba(0, 123, 255, 0.1);
-  transition: all 0.2s;
-}
-
-.b-verify__button--secondary:hover:not(:disabled) {
-  background-color: #d0e7ff;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 123, 255, 0.15);
-}
-
-.b-verify__button--secondary:disabled {
-  background-color: #e9ecef;
-  border-color: #ced4da;
-  color: #6c757d;
-  cursor: not-allowed;
-}
-
-/* Modifier: Tombol Batal */
-.b-verify__button--cancel {
-  background-color: #6c757d;
-  color: white;
-  border-radius: 8px;
-  padding: 10px 25px;
-  border: none;
-}
-.b-verify__button--cancel:hover {
-  background-color: #5a6268;
-}
-
-/* Element: Kartu Preview */
-.b-verify__preview-card {
-  margin-top: 2rem;
-  border: 1px solid #dee2e6;
-  border-radius: 12px;
-  padding: 25px;
-  text-align: left;
-  background-color: #f8f9fa;
-  animation: fadeIn 0.5s;
-}
-
-.b-verify__preview-header {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  color: #0056b3;
-  font-size: 1.2rem;
-  margin-bottom: 20px;
-  padding-bottom: 15px;
-  border-bottom: 1px solid #e9ecef;
-}
-
-.b-verify__preview-header h4 {
-  margin: 0;
-  font-weight: 600;
-}
-
-.b-verify__preview-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 1rem;
-  margin-top: 25px;
-  padding-top: 20px;
-  border-top: 1px solid #e9ecef;
-}
-
-/* Override grid-template-columns untuk preview agar lebih fleksibel */
-.b-verify__preview-card .b-verify__data-row {
-  grid-template-columns: 150px 1fr;
+  padding: 2rem;
+  background-color: #f3f4f6;
+  color: #6b7280;
+  font-size: 0.9rem;
+  border-top: 1px solid #e5e7eb;
 }
