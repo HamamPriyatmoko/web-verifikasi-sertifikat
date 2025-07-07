@@ -1,10 +1,5 @@
 [
   {
-    "inputs": [],
-    "stateMutability": "nonpayable",
-    "type": "constructor"
-  },
-  {
     "anonymous": false,
     "inputs": [
       {
@@ -46,20 +41,6 @@
     ],
     "name": "SertifikatDiterbitkan",
     "type": "event"
-  },
-  {
-    "inputs": [],
-    "name": "admin",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function",
-    "constant": true
   },
   {
     "inputs": [
@@ -174,19 +155,6 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "_adminBaru",
-        "type": "address"
-      }
-    ],
-    "name": "ubahAdmin",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "components": [
           {
             "internalType": "string",
@@ -214,7 +182,7 @@
             "type": "string"
           }
         ],
-        "internalType": "struct BlockchainSertifikasi.SertifikatInput",
+        "internalType": "struct BlockchainSertifikasiPublik.SertifikatInput",
         "name": "_input",
         "type": "tuple"
       }
@@ -286,7 +254,7 @@
             "type": "uint256"
           }
         ],
-        "internalType": "struct BlockchainSertifikasi.Sertifikat",
+        "internalType": "struct BlockchainSertifikasiPublik.Sertifikat",
         "name": "",
         "type": "tuple"
       }
@@ -303,7 +271,7 @@
         "type": "string"
       }
     ],
-    "name": "getSertifikatByHash",
+    "name": "findSertifikatHash",
     "outputs": [
       {
         "components": [
@@ -343,7 +311,7 @@
             "type": "uint256"
           }
         ],
-        "internalType": "struct BlockchainSertifikasi.Sertifikat",
+        "internalType": "struct BlockchainSertifikasiPublik.Sertifikat",
         "name": "",
         "type": "tuple"
       }

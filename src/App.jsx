@@ -1,18 +1,17 @@
-// src/App.jsx
-
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 
-// Import semua komponen halaman Anda
 import Home from './landing/home';
 import Login from './page/login/Login';
-import Register from './page/register/Register'; // Asumsi Anda sudah membuat ini
+import Register from './page/register/Register';
 import MainLayout from './components/MainLayout';
 import Dashboard from './page/dashboard/Dashboard';
 import DaftarSertifikat from './page/daftarsertifikat/DaftarSertifikat';
 import Verifikasi from './page/verifikasi/VerifikasiSertifikat';
+import HasilVerifikasi from './page/hasilverifikasi/HasilVerifikasi';
+import ForgotPassword from './page/forgot-password/ForgotPassword';
+import ResetPassword from './page/reset-password/ResetPassword';
 
-// 1. IMPORT KOMPONEN PROTECTEDROUTE
 import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
@@ -23,6 +22,9 @@ function App() {
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/verify/:hash" element={<HasilVerifikasi />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password/:token" element={<ResetPassword />} />
 
         {/* Rute yang Dilindungi (hanya bisa diakses setelah login) */}
         <Route element={<MainLayout />}>

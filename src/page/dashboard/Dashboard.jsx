@@ -1,40 +1,24 @@
-// src/page/dashboard/Dashboard.jsx (Versi Final dengan Desain Input Baru)
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Web3 from 'web3';
 import toast, { Toaster } from 'react-hot-toast';
 
-// Impor ikon tidak lagi diperlukan untuk form ini
-import './Dashboard.css'; // Pastikan CSS baru sudah digunakan
+import './Dashboard.css';
 import FileInput from '../../components/FileInput/FileInput';
 import contractABI from '../../abi/BlockchainSertifikasi.json';
 
 const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ADDRESS;
-const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000';
+const API_URL = import.meta.env.VITE_API_BASE;
 
 const initialState = {
   nim: '',
   nama: '',
   universitas: '',
+  fakultas: '',
   jurusan: '',
   nomerSertifikat: '',
-  fakultas: '',
   tahunLulus: '',
 };
 const initialFiles = { file_ijazah: null, file_skpi: null };
-const universitasList = [
-  'Universitas Muhammadiyah Yogyakarta',
-  'Universitas Gadjah Mada',
-  'Institut Teknologi Bandung',
-  'Universitas Indonesia',
-];
-const jurusanList = [
-  'Teknologi Informasi',
-  'Teknik Elektro',
-  'Ilmu Komputer',
-  'Sistem Informasi',
-  'Teknik Mesin',
-];
 
 const Dashboard = () => {
   const [step, setStep] = useState(1);
@@ -42,6 +26,82 @@ const Dashboard = () => {
   const [fileData, setFileData] = useState(initialFiles);
   const [errors, setErrors] = useState({});
   const [confirmed, setConfirmed] = useState(false);
+
+  // State untuk menyimpan daftar dari API & item terpilih
+  const [universitasList, setUniversitasList] = useState([]);
+  const [fakultasList, setFakultasList] = useState([]);
+  const [jurusanList, setJurusanList] = useState([]);
+
+  const [selectedUniversitas, setSelectedUniversitas] = useState('');
+  const [selectedFakultas, setSelectedFakultas] = useState('');
+
+  // State untuk status loading dropdown
+  const [loadingUniversitas, setLoadingUniversitas] = useState(true);
+  const [loadingFakultas, setLoadingFakultas] = useState(false);
+  const [loadingJurusan, setLoadingJurusan] = useState(false);
+
+  // useEffect untuk mengambil data universitas saat komponen pertama kali dimuat
+  useEffect(() => {
+    const fetchUniversitas = async () => {
+      try {
+        setLoadingUniversitas(true);
+        const res = await fetch(`${API_URL}/api/universitas`);
+        if (!res.ok) throw new Error('Gagal mengambil daftar universitas');
+        const data = await res.json();
+        setUniversitasList(data);
+      } catch (error) {
+        toast.error(error.message);
+      } finally {
+        setLoadingUniversitas(false);
+      }
+    };
+    fetchUniversitas();
+  }, []);
+
+  // useEffect untuk mengambil data fakultas SAAT universitas dipilih
+  useEffect(() => {
+    if (!selectedUniversitas) {
+      setFakultasList([]);
+      setJurusanList([]);
+      return;
+    }
+    const fetchFakultas = async () => {
+      try {
+        setLoadingFakultas(true);
+        const res = await fetch(`${API_URL}/api/universitas/${selectedUniversitas}/fakultas`);
+        if (!res.ok) throw new Error('Gagal mengambil daftar fakultas');
+        const data = await res.json();
+        setFakultasList(data);
+      } catch (error) {
+        toast.error(error.message);
+      } finally {
+        setLoadingFakultas(false);
+      }
+    };
+    fetchFakultas();
+  }, [selectedUniversitas]);
+
+  // useEffect untuk mengambil data jurusan SAAT fakultas dipilih
+  useEffect(() => {
+    if (!selectedFakultas) {
+      setJurusanList([]);
+      return;
+    }
+    const fetchJurusan = async () => {
+      try {
+        setLoadingJurusan(true);
+        const res = await fetch(`${API_URL}/api/fakultas/${selectedFakultas}/jurusan`);
+        if (!res.ok) throw new Error('Gagal mengambil daftar jurusan');
+        const data = await res.json();
+        setJurusanList(data);
+      } catch (error) {
+        toast.error(error.message);
+      } finally {
+        setLoadingJurusan(false);
+      }
+    };
+    fetchJurusan();
+  }, [selectedFakultas]);
 
   const validateStep = () => {
     const newErrors = {};
@@ -76,6 +136,7 @@ const Dashboard = () => {
       toast.error('Mohon lengkapi semua data pada langkah ini.');
     }
   };
+
   const prevStep = () => setStep((s) => s - 1);
 
   const handleChange = (e) => {
@@ -94,20 +155,51 @@ const Dashboard = () => {
     setFileData({ ...fileData, [name]: null });
   };
 
+  const handleDynamicSelectChange = (e) => {
+    const { name, value } = e.target;
+    const selectedId = value;
+    let selectedName = '';
+
+    const newFormData = { ...formData };
+
+    if (name === 'universitas') {
+      setSelectedUniversitas(selectedId);
+      selectedName = universitasList.find((u) => u.id == selectedId)?.nama_universitas || '';
+      newFormData.fakultas = '';
+      newFormData.jurusan = '';
+      setFakultasList([]);
+      setJurusanList([]);
+      setSelectedFakultas('');
+    } else if (name === 'fakultas') {
+      setSelectedFakultas(selectedId);
+      selectedName = fakultasList.find((f) => f.id == selectedId)?.nama_fakultas || '';
+      newFormData.jurusan = '';
+      setJurusanList([]);
+    } else if (name === 'jurusan') {
+      // Here we just update the name in formData, no new fetching
+      const selectedOption = e.target.options[e.target.selectedIndex];
+      selectedName = selectedOption.text;
+    }
+
+    newFormData[name] = selectedName;
+    setFormData(newFormData);
+  };
+
   const handleSubmit = async () => {
     if (!validateStep()) {
       toast.error('Mohon centang kotak konfirmasi untuk melanjutkan.');
       return;
     }
     const toastId = toast.loading('Memulai proses penerbitan...');
-
     try {
       const fd = new FormData();
       Object.entries(formData).forEach(([k, v]) => fd.append(k, v));
       Object.entries(fileData).forEach(([k, f]) => fd.append(k, f));
+      console.log(formData);
 
       toast.loading('1/2 Mengunggah file ke IPFS & Hashing...', { id: toastId });
       const res = await fetch(`${API_URL}/api/sertifikat`, { method: 'POST', body: fd });
+      console.log(res);
       const body = await res.json();
       if (!res.ok) throw new Error(body.error || 'Upload atau hashing gagal.');
 
@@ -140,6 +232,8 @@ const Dashboard = () => {
       setFormData(initialState);
       setFileData(initialFiles);
       setConfirmed(false);
+      setSelectedUniversitas('');
+      setSelectedFakultas('');
     } catch (err) {
       console.error(err);
       const message = err.code === 4001 ? 'Transaksi dibatalkan oleh pengguna.' : err.message;
@@ -150,7 +244,6 @@ const Dashboard = () => {
   const renderStep = () => {
     switch (step) {
       case 1:
-        // Ini adalah JSX dengan struktur input yang baru dan lebih sederhana
         return (
           <>
             <h2 className="form-title">Langkah 1: Isi Data Mahasiswa</h2>
@@ -180,61 +273,76 @@ const Dashboard = () => {
                 {errors.nama && <p className="error-text">{errors.nama}</p>}
               </div>
             </div>
+
             <div className="form-row">
               <div className="form-group">
                 <label htmlFor="universitas">Universitas</label>
                 <select
                   id="universitas"
                   name="universitas"
-                  value={formData.universitas}
-                  onChange={handleChange}
+                  value={selectedUniversitas}
+                  onChange={handleDynamicSelectChange}
+                  disabled={loadingUniversitas}
                   className={`form-select ${errors.universitas ? 'input-error' : ''}`}>
-                  <option value="">-- Pilih Universitas --</option>
+                  <option value="">
+                    {loadingUniversitas ? 'Memuat...' : '-- Pilih Universitas --'}
+                  </option>
                   {universitasList.map((u) => (
-                    <option key={u} value={u}>
-                      {u}
+                    <option key={u.id} value={u.id}>
+                      {u.nama_universitas}
                     </option>
                   ))}
                 </select>
                 {errors.universitas && <p className="error-text">{errors.universitas}</p>}
               </div>
+
+              <div className="form-group">
+                <label htmlFor="fakultas">Fakultas</label>
+                <select
+                  id="fakultas"
+                  name="fakultas"
+                  value={selectedFakultas}
+                  onChange={handleDynamicSelectChange}
+                  disabled={!selectedUniversitas || loadingFakultas}
+                  className={`form-select ${errors.fakultas ? 'input-error' : ''}`}>
+                  <option value="">{loadingFakultas ? 'Memuat...' : '-- Pilih Fakultas --'}</option>
+                  {fakultasList.map((f) => (
+                    <option key={f.id} value={f.id}>
+                      {f.nama_fakultas}
+                    </option>
+                  ))}
+                </select>
+                {errors.fakultas && <p className="error-text">{errors.fakultas}</p>}
+              </div>
+            </div>
+
+            <div className="form-row">
               <div className="form-group">
                 <label htmlFor="jurusan">Jurusan</label>
                 <select
                   id="jurusan"
                   name="jurusan"
-                  value={formData.jurusan}
-                  onChange={handleChange}
+                  value={jurusanList.find((j) => j.nama_jurusan === formData.jurusan)?.id || ''}
+                  onChange={handleDynamicSelectChange}
+                  disabled={!selectedFakultas || loadingJurusan}
                   className={`form-select ${errors.jurusan ? 'input-error' : ''}`}>
-                  <option value="">-- Pilih Jurusan --</option>
+                  <option value="">{loadingJurusan ? 'Memuat...' : '-- Pilih Jurusan --'}</option>
                   {jurusanList.map((j) => (
-                    <option key={j} value={j}>
-                      {j}
+                    <option key={j.id} value={j.id}>
+                      {j.nama_jurusan}
                     </option>
                   ))}
                 </select>
                 {errors.jurusan && <p className="error-text">{errors.jurusan}</p>}
               </div>
-            </div>
-            <div className="form-row">
-              <div className="form-group">
-                <label htmlFor="fakultas">Fakultas</label>
-                <input
-                  id="fakultas"
-                  name="fakultas"
-                  type="text"
-                  value={formData.fakultas}
-                  onChange={handleChange}
-                  className={`form-input ${errors.fakultas ? 'input-error' : ''}`}
-                />
-                {errors.fakultas && <p className="error-text">{errors.fakultas}</p>}
-              </div>
+
               <div className="form-group">
                 <label htmlFor="tahunLulus">Tahun Lulus</label>
                 <input
                   id="tahunLulus"
                   name="tahunLulus"
                   type="number"
+                  placeholder="Contoh: 2024"
                   value={formData.tahunLulus}
                   onChange={handleChange}
                   className={`form-input ${errors.tahunLulus ? 'input-error' : ''}`}
@@ -242,6 +350,7 @@ const Dashboard = () => {
                 {errors.tahunLulus && <p className="error-text">{errors.tahunLulus}</p>}
               </div>
             </div>
+
             <div className="form-group">
               <label htmlFor="nomerSertifikat">Nomor Sertifikat</label>
               <input

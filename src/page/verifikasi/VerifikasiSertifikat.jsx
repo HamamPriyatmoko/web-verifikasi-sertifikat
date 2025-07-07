@@ -1,81 +1,31 @@
-// src/page/verifikasi/VerifikasiSertifikat.jsx (Versi Lengkap & Refactor)
-
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
 import { FaCamera, FaTimes, FaFileUpload } from 'react-icons/fa';
 import VerifyButton from '../../components/ButtonVerify/ButtonVerify';
-import VerificationModal from '../../components/VerificationModal/VerificationModal'; // <-- IMPORT KOMPONEN BARU
+import VerificationModal from '../../components/VerificationModal/VerificationModal';
 import contractABI from '../../abi/BlockchainSertifikasi.json';
-import './VerifikasiSertifikat.css'; // <-- Pastikan ini mengarah ke file CSS BARU
+import './VerifikasiSertifikat.css';
 import { web3Read } from '../../utils/web3';
 
-// --- Konfigurasi dari Environment Variables ---
 const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ADDRESS;
-// Gunakan VITE_API_URL dari .env, dengan fallback ke localhost:5000
-const API_URL = import.meta.env.VITE_API_BASE || 'http://localhost:5000';
+const API_URL = import.meta.env.VITE_API_BASE;
 const IPFS_GATEWAY = 'https://gateway.pinata.cloud/ipfs/';
 
 export default function VerifikasiSertifikat() {
-  // --- State Management ---
   const [hashValue, setHashValue] = useState('');
-  const [verifikasiResult, setVerifikasiResult] = useState(null); // Menggantikan showModal
+  const [verifikasiResult, setVerifikasiResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState('');
   const [scanning, setScanning] = useState(false);
   const [pdfPreview, setPdfPreview] = useState(null);
 
-  // --- Refs ---
+  const [cameras, setCameras] = useState([]);
+  const [selectedCameraId, setSelectedCameraId] = useState('');
+
   const scannerRef = useRef(null);
   const fileInputRef = useRef(null);
 
-  // --- Logic Hooks & Functions ---
-
-  useEffect(() => {
-    if (!scanning) return;
-
-    const scanner = new Html5Qrcode('reader-container');
-    scannerRef.current = scanner;
-
-    Html5Qrcode.getCameras()
-      .then((devices) => {
-        if (devices && devices.length) {
-          scanner
-            .start(
-              { deviceId: { exact: devices[0].id } },
-              { fps: 10, qrbox: { width: 250, height: 250 } },
-              (decodedText) => {
-                scanner.stop();
-                setScanning(false);
-                // Logika parsing hash dari QR code bisa ditambahkan di sini jika perlu
-                handleVerifyByHash(decodedText.trim());
-              },
-              (errorMessage) => {
-                /* Abaikan error 'QR code not found' */
-                console.log(errorMessage);
-              },
-            )
-            .catch((err) => {
-              setErrorMsg('Gagal memulai scanner: ' + (err.message || err));
-              setScanning(false);
-            });
-        } else {
-          throw new Error('Tidak ada kamera yang ditemukan.');
-        }
-      })
-      .catch((err) => {
-        setErrorMsg('Error akses kamera: ' + (err.message || err));
-        setScanning(false);
-      });
-
-    // Cleanup function
-    return () => {
-      if (scannerRef.current?.isScanning) {
-        scannerRef.current.stop().catch(console.error);
-      }
-    };
-  }, [scanning]);
-
-  const handleVerifyByHash = async (hash) => {
+  const handleVerifyByHash = useCallback(async (hash) => {
     setLoading(true);
     setErrorMsg('');
     setVerifikasiResult(null);
@@ -89,7 +39,7 @@ export default function VerifikasiSertifikat() {
 
     try {
       const contract = new web3Read.eth.Contract(contractABI, CONTRACT_ADDRESS);
-      const cert = await contract.methods.getSertifikatByHash(hash).call();
+      const cert = await contract.methods.findSertifikatHash(hash).call();
 
       if (cert.id === '0x'.padEnd(66, '0')) {
         throw new Error('Hash tidak terdaftar di blockchain.');
@@ -101,7 +51,7 @@ export default function VerifikasiSertifikat() {
       );
       if (!metaRes.ok) throw new Error('Gagal mengambil metadata dari IPFS.');
       const meta = await metaRes.json();
-      console.log(meta);
+
       const result = {
         data: {
           nim: cert.nim,
@@ -118,19 +68,81 @@ export default function VerifikasiSertifikat() {
           nomorBlok: Number(blk.number),
           hashBlok: blk.hash,
           parentHash: blk.parentHash,
-          timestamp: Number(blk.timestamp),
+          timestamp: new Date(Number(blk.timestamp) * 1000).toLocaleString('id-ID'),
           transactions_count: blk.transactions.length,
         },
       };
 
-      // **PERUBAHAN UTAMA**: Langsung set hasil verifikasi untuk memicu modal
       setVerifikasiResult(result);
     } catch (err) {
       setErrorMsg(err.message);
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (scanning) {
+      Html5Qrcode.getCameras()
+        .then((devices) => {
+          if (devices && devices.length) {
+            setCameras(devices);
+            if (!selectedCameraId) {
+              setSelectedCameraId(devices[0].id);
+            }
+          } else {
+            setErrorMsg('Tidak ada kamera yang ditemukan.');
+            setScanning(false);
+          }
+        })
+        .catch((err) => {
+          setErrorMsg('Error akses kamera: ' + (err.message || err));
+          setScanning(false);
+        });
+    } else {
+      setCameras([]);
+    }
+  }, [scanning, selectedCameraId]);
+
+  useEffect(() => {
+    if (!scanning || !selectedCameraId) {
+      return;
+    }
+
+    const scanner = new Html5Qrcode('reader-container');
+    scannerRef.current = scanner;
+
+    scanner
+      .start(
+        { deviceId: { exact: selectedCameraId } },
+        { fps: 10, qrbox: { width: 250, height: 250 } },
+        (decodedText) => {
+          if (scannerRef.current?.isScanning) {
+            scannerRef.current.stop();
+          }
+          setScanning(false);
+          const urlParts = decodedText.trim().split('/');
+          const hashFromQr = urlParts[urlParts.length - 1];
+          handleVerifyByHash(hashFromQr);
+        },
+        (errorMessage) => {
+          /* Abaikan error 'QR code not found' */
+          console.log(errorMessage);
+        },
+      )
+      .catch((err) => {
+        setErrorMsg('Gagal memulai scanner: ' + (err.message || err));
+        setScanning(false);
+      });
+
+    return () => {
+      if (scannerRef.current?.isScanning) {
+        scannerRef.current.stop().catch((error) => {
+          console.warn('Scanner dihentikan saat cleanup.', error);
+        });
+      }
+    };
+  }, [scanning, selectedCameraId, handleVerifyByHash]);
 
   const handlePdfUpload = async (e) => {
     const file = e.target.files[0];
@@ -225,6 +237,22 @@ export default function VerifikasiSertifikat() {
         <div className="verifikasi-dynamic-area">
           {scanning && (
             <div className="verifikasi-scanner-wrapper">
+              {cameras.length > 1 && (
+                <div className="verifikasi-camera-select-group">
+                  <label htmlFor="camera-select">Pilih Kamera:</label>
+                  <select
+                    id="camera-select"
+                    className="verifikasi-camera-select"
+                    value={selectedCameraId}
+                    onChange={(e) => setSelectedCameraId(e.target.value)}>
+                    {cameras.map((camera) => (
+                      <option key={camera.id} value={camera.id}>
+                        {camera.label || `Kamera ${camera.id.substring(0, 6)}`}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
               <div id="reader-container"></div>
             </div>
           )}
@@ -263,7 +291,6 @@ export default function VerifikasiSertifikat() {
         </div>
       </div>
 
-      {/* Panggil komponen modal di sini. Modal akan muncul jika verifikasiResult tidak null */}
       <VerificationModal result={verifikasiResult} onClose={closeModal} />
     </div>
   );

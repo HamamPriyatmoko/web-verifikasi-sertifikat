@@ -6,12 +6,12 @@ import { Html5Qrcode } from 'html5-qrcode';
 import { FaCamera, FaFileUpload, FaSpinner } from 'react-icons/fa';
 import { web3Read } from '../utils/web3';
 import contractABI from '../abi/BlockchainSertifikasi.json';
-import VerificationModal from '../components/VerificationModal/VerificationModal'; // <-- GUNAKAN KEMBALI MODAL
-import './Home.css'; // <-- Gunakan CSS baru
+import VerificationModal from '../components/VerificationModal/VerificationModal';
+import './Home.css';
 
 const CONTRACT_ADDRESS = import.meta.env.VITE_CONTRACT_ADDRESS;
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-const IPFS_GATEWAY = import.meta.env.VITE_API_BASE;
+const API_URL = import.meta.env.VITE_API_BASE;
+// const IPFS_GATEWAY = import.meta.env.VITE_API_BASE;
 
 export default function Home() {
   const [inputValue, setInputValue] = useState('');
@@ -25,7 +25,6 @@ export default function Home() {
 
   const readContract = new web3Read.eth.Contract(contractABI, CONTRACT_ADDRESS);
 
-  // Fungsi utama verifikasi (hanya via hash)
   const verifyHash = async (hash) => {
     setLoading(true);
     setResult(null);
@@ -34,13 +33,15 @@ export default function Home() {
     try {
       if (!hash) throw new Error('Hash tidak boleh kosong.');
 
-      const cert = await readContract.methods.getSertifikatByHash(hash).call();
+      const cert = await readContract.methods.findSertifikatHash(hash).call();
       if (cert.id === '0x'.padEnd(66, '0')) {
         throw new Error('Sertifikat dengan hash ini tidak terdaftar di blockchain.');
       }
 
       const blk = await web3Read.eth.getBlock(cert.blockNumber);
-      const metaRes = await fetch(`${IPFS_GATEWAY}/api/certificate/metadata?cid=${cert.cidDetail}`);
+      const metaRes = await fetch(
+        `${API_URL}/api/certificate/metadata?cid=${cert.cidDetail}&nim=${cert.nim}`,
+      );
       if (!metaRes.ok) throw new Error('Gagal mengambil detail sertifikat dari IPFS.');
       const meta = await metaRes.json();
 
