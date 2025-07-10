@@ -1,29 +1,42 @@
-// src/page/daftarsertifikat/DaftarSertifikat.jsx (Versi Final dengan Dropdown)
-
 import React, { useState, useEffect, useMemo } from 'react';
 import { FaSearch, FaDownload } from 'react-icons/fa';
 import { AiOutlineLoading } from 'react-icons/ai';
 import { useDebounce } from '../../utils/useDebounce';
 import './DaftarSertifikat.css';
-import DownloadPdfButton from '../../components/ButtonDownload/DownloadPdfButton'; // Pastikan path ini benar
+import DownloadPdfButton from '../../components/ButtonDownload/DownloadPdfButton';
 
-const API_BASE = import.meta.env.VITE_API_URL || 'http://127.0.0.1:5000';
+const API_BASE = import.meta.env.VITE_API_BASE;
+
+const formatTimestamp = (timestamp) => {
+  if (!timestamp) return '-';
+
+  const date = new Date(timestamp * 1000);
+
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+
+  return `${day}-${month}-${year}`;
+};
 
 export default function DaftarSertifikat() {
   const [allData, setAllData] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10); // State ini sekarang akan terpakai
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [loading, setLoading] = useState(true);
 
-  // Gunakan debounce untuk menunda filtering saat pengguna mengetik
   const debouncedSearchTerm = useDebounce(searchTerm, 500);
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`${API_BASE}/api/sertifikat`);
+        const res = await fetch(`${API_BASE}/api/sertifikat`, {
+          headers: {
+            'ngrok-skip-browser-warning': 'true',
+          },
+        });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const { sertifikat = [] } = await res.json();
         setAllData(sertifikat);
@@ -37,9 +50,8 @@ export default function DaftarSertifikat() {
     fetchData();
   }, []);
 
-  // Gunakan useMemo agar filtering hanya berjalan jika data atau search term berubah
   const filteredData = useMemo(() => {
-    setCurrentPage(1); // Kembali ke halaman 1 setiap kali filter berubah
+    setCurrentPage(1);
     if (!debouncedSearchTerm) return allData;
     const lower = debouncedSearchTerm.toLowerCase();
     return allData.filter(
@@ -49,12 +61,10 @@ export default function DaftarSertifikat() {
     );
   }, [allData, debouncedSearchTerm]);
 
-  // Kalkulasi untuk pagination
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const firstIdx = (currentPage - 1) * itemsPerPage;
   const currentItems = filteredData.slice(firstIdx, firstIdx + itemsPerPage);
 
-  // Handler untuk paginasi
   const handlePageChange = (pageNumber) => {
     if (pageNumber < 1 || pageNumber > totalPages) return;
     setCurrentPage(pageNumber);
@@ -84,14 +94,12 @@ export default function DaftarSertifikat() {
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
-
-            {/* ELEMEN DROPDOWN YANG DITAMBAHKAN KEMBALI */}
             <select
               className="ds-items-per-page"
               value={itemsPerPage}
               onChange={(e) => {
                 setItemsPerPage(Number(e.target.value));
-                setCurrentPage(1); // Kembali ke halaman 1 saat item diubah
+                setCurrentPage(1);
               }}>
               <option value={10}>10 per halaman</option>
               <option value={20}>20 per halaman</option>
@@ -106,6 +114,7 @@ export default function DaftarSertifikat() {
               <tr>
                 <th>NIM</th>
                 <th>Universitas</th>
+                <th>Waktu Terbit</th>
                 <th style={{ textAlign: 'center' }}>Action</th>
               </tr>
             </thead>
@@ -113,9 +122,10 @@ export default function DaftarSertifikat() {
               {currentItems.length > 0 ? (
                 currentItems.map((item) => (
                   <tr key={item.id}>
-                    <td>{item.nim}</td>
-                    <td>{item.universitas || '-'}</td>
-                    <td style={{ textAlign: 'center' }}>
+                    <td data-label="NIM">{item.nim}</td>
+                    <td data-label="Universitas">{item.universitas || '-'}</td>
+                    <td data-label="Waktu Terbit">{formatTimestamp(item.timestamp)}</td>
+                    <td data-label="Action" style={{ textAlign: 'center' }}>
                       <DownloadPdfButton
                         nim={item.nim}
                         className="ds-action-btn"

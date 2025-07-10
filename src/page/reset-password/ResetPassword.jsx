@@ -1,63 +1,55 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import toast, { Toaster } from 'react-hot-toast';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import '../login/AuthForm.css';
 
-function Register() {
-  const [username, setUsername] = useState('');
-  const [email, setEmail] = useState('');
+function ResetPassword() {
+  const { token } = useParams();
+  const navigate = useNavigate();
+
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [successMessage, setSuccessMessage] = useState(null);
 
-  const navigate = useNavigate();
-
-  const API_URL = `${import.meta.env.VITE_API_BASE}/api/auth/register`;
+  const API_URL = `${import.meta.env.VITE_API_BASE}/api/auth/reset-password`;
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
     if (password !== confirmPassword) {
       toast.error('Password dan konfirmasi password tidak cocok.');
       setError('Password dan konfirmasi password tidak cocok.');
       return;
     }
-
-    setError(null);
-    setSuccessMessage(null);
     setIsLoading(true);
+    setError(null);
+
+    const toastId = toast.loading('Menyimpan password baru...');
 
     try {
       const response = await fetch(API_URL, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ username, email, password }),
+        headers: { 'Content-Type': 'application/json',  },
+        body: JSON.stringify({ token, password }),
       });
 
       const data = await response.json();
-
       if (!response.ok) {
-        throw new Error(data.error || 'Terjadi kesalahan saat registrasi.');
+        throw new Error(data.error || 'Gagal mereset password.');
       }
 
-      toast.success('Registrasi berhasil! Anda akan dialihkan...');
-      setSuccessMessage('Registrasi berhasil! Anda akan dialihkan ke halaman login...');
-
-      setTimeout(() => {
-        navigate('/login');
-      }, 3000);
+      toast.success('Password berhasil direset! Anda akan dialihkan ke halaman login.', {
+        id: toastId,
+        duration: 4000,
+      });
+      setTimeout(() => navigate('/login'), 4000);
     } catch (err) {
       setError(err.message);
-      toast.error(err.message);
+      toast.error(err.message, { id: toastId });
     } finally {
       setIsLoading(false);
     }
@@ -72,49 +64,10 @@ function Register() {
           <p>Autentikasi sertifikat digital berbasis blockchain.</p>
         </div>
       </div>
-
       <div className="login-container">
         <form className="login-form" onSubmit={handleSubmit}>
-          <h2>Buat Akun Baru</h2>
-          <p className="subtitle">Lengkapi data untuk mendaftar sebagai admin.</p>
-
-          <div className="input-wrapper">
-            <svg
-              className="input-icon"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="currentColor">
-              <path d="M12 2.5a5.5 5.5 0 0 1 5.5 5.5c0 1.571-.67 3.003-1.755 4.022C13.62 14.133 12.01 15.5 12 15.5s-1.62-1.367-3.745-3.478C7.17 11.003 6.5 9.57 6.5 8a5.5 5.5 0 0 1 5.5-5.5zm0 3a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM19.528 17.437A20.35 20.35 0 0 0 12 16.5a20.35 20.35 0 0 0-7.528.937A6.5 6.5 0 0 1 12 14a6.5 6.5 0 0 1 7.528 3.437z"></path>
-            </svg>
-            <input
-              type="text"
-              id="username"
-              placeholder="Pilih username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-              disabled={isLoading}
-            />
-          </div>
-
-          <div className="input-wrapper">
-            <svg
-              className="input-icon"
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="currentColor">
-              <path d="M2.5 4A1.5 1.5 0 0 1 4 2.5h16A1.5 1.5 0 0 1 21.5 4v.516l-8.62 6.033a1.5 1.5 0 0 1-1.76 0L2.5 4.516V4zm0 2.651l8.223 5.756a3.5 3.5 0 0 0 4.114 0L21.5 6.65V18.5a1.5 1.5 0 0 1-1.5 1.5H4A1.5 1.5 0 0 1 2.5 18.5v-11.85z"></path>
-            </svg>
-            <input
-              type="email"
-              id="email"
-              placeholder="Masukkan email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              disabled={isLoading}
-            />
-          </div>
+          <h2>Atur Password Baru</h2>
+          <p className="subtitle">Masukkan password baru Anda di bawah ini.</p>
 
           <div className="input-wrapper">
             <svg
@@ -126,8 +79,7 @@ function Register() {
             </svg>
             <input
               type={showPassword ? 'text' : 'password'}
-              id="password"
-              placeholder="Buat password"
+              placeholder="Password Baru"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -151,8 +103,7 @@ function Register() {
             </svg>
             <input
               type={showConfirmPassword ? 'text' : 'password'}
-              id="confirmPassword"
-              placeholder="Konfirmasi password"
+              placeholder="Konfirmasi Password Baru"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
@@ -167,19 +118,14 @@ function Register() {
           </div>
 
           {error && <p className="login-error">{error}</p>}
-          {successMessage && <p className="login-success">{successMessage}</p>}
 
           <button type="submit" className="login-button" disabled={isLoading}>
-            {isLoading ? 'Memproses...' : 'Daftar'}
+            {isLoading ? 'Menyimpan...' : 'Simpan Password'}
           </button>
-
-          <p className="register-link">
-            Sudah punya akun? <Link to="/login">Masuk di sini</Link>
-          </p>
         </form>
       </div>
     </div>
   );
 }
 
-export default Register;
+export default ResetPassword;

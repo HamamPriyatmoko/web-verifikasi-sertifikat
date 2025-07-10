@@ -1,37 +1,44 @@
 import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom'; // Import Link
+import { useNavigate, Link } from 'react-router-dom';
+import toast, { Toaster } from 'react-hot-toast'; // Impor untuk notifikasi
+import { FaEye, FaEyeSlash } from 'react-icons/fa'; // Impor ikon mata
 import './AuthForm.css';
 
 function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false); // State untuk lihat password
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const navigate = useNavigate();
 
-  const API_URL = 'http://127.0.0.1:5000/api/auth/login';
+  const navigate = useNavigate();
+  const API_URL = `${import.meta.env.VITE_API_BASE}/api/auth/login`;
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    setError(null);
     setIsLoading(true);
+
+    const toastId = toast.loading('Mencoba masuk...');
 
     try {
       const response = await fetch(API_URL, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json', 'ngrok-skip-browser-warning': 'true' },
         body: JSON.stringify({ username, password }),
       });
       const data = await response.json();
+
       if (!response.ok) {
         throw new Error(data.error || 'Terjadi kesalahan saat login.');
       }
+
+      toast.success('Login berhasil! Mengarahkan ke dashboard...', { id: toastId });
       localStorage.setItem('accessToken', data.access_token);
-      navigate('/dashboard');
+
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 1500); // Beri sedikit jeda agar notifikasi terbaca
     } catch (err) {
-      setError(err.message);
+      toast.error(err.message, { id: toastId });
     } finally {
       setIsLoading(false);
     }
@@ -39,7 +46,7 @@ function Login() {
 
   return (
     <div className="login-page">
-      {/* Bagian Kiri - Branding */}
+      <Toaster position="top-right" />
       <div className="login-branding">
         <div className="branding-content">
           <h1>B-Verify</h1>
@@ -47,14 +54,12 @@ function Login() {
         </div>
       </div>
 
-      {/* Bagian Kanan - Form Container */}
       <div className="login-container">
         <form className="login-form" onSubmit={handleSubmit}>
           <h2>Selamat Datang Kembali</h2>
           <p className="subtitle">Silakan masuk ke akun admin Anda.</p>
 
           <div className="input-wrapper">
-            {/* Ikon untuk username */}
             <svg
               className="input-icon"
               xmlns="http://www.w3.org/2000/svg"
@@ -74,7 +79,6 @@ function Login() {
           </div>
 
           <div className="input-wrapper">
-            {/* Ikon untuk password */}
             <svg
               className="input-icon"
               xmlns="http://www.w3.org/2000/svg"
@@ -83,7 +87,7 @@ function Login() {
               <path d="M18 8h-1V6A5 5 0 0 0 7 6v2H6a3 3 0 0 0-3 3v8a3 3 0 0 0 3 3h12a3 3 0 0 0 3-3v-8a3 3 0 0 0-3-3zM9 6a3 3 0 0 1 6 0v2H9V6zm9 14H6a1 1 0 0 1-1-1v-8a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1z"></path>
             </svg>
             <input
-              type="password"
+              type={showPassword ? 'text' : 'password'}
               id="password"
               placeholder="Masukkan password"
               value={password}
@@ -91,9 +95,17 @@ function Login() {
               required
               disabled={isLoading}
             />
+            <button
+              type="button"
+              className="password-toggle-icon"
+              onClick={() => setShowPassword(!showPassword)}>
+              {showPassword ? <FaEyeSlash /> : <FaEye />}
+            </button>
           </div>
 
-          {error && <p className="login-error">{error}</p>}
+          <div className="form-options">
+            <Link to="/forgot-password">Lupa Password?</Link>
+          </div>
 
           <button type="submit" className="login-button" disabled={isLoading}>
             {isLoading ? 'Memproses...' : 'Login'}

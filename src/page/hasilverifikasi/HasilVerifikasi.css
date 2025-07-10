@@ -1,0 +1,197 @@
+/* CSS Khusus untuk Halaman Hasil Verifikasi dengan Penamaan Baru */
+
+.hasilverifikasi-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background-color: #f0f2f5;
+  padding: 2rem;
+  font-family: sans-serif;
+  text-align: center;
+}
+
+.hasilverifikasi-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 0;
+  width: 100%;
+  max-width: 800px;
+  overflow: hidden;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.hasilverifikasi-card.success {
+  border-top: 5px solid #28a745;
+}
+.hasilverifikasi-card.error {
+  padding: 2.5rem 3rem; /* Padding khusus untuk kartu error */
+  border-top: 5px solid #dc3545;
+}
+
+.hasilverifikasi-header {
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: center;
+}
+
+.hasilverifikasi-header h3 {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  font-size: 1.5rem;
+  color: #166534;
+  margin: 0;
+}
+
+.hasilverifikasi-body {
+  padding: 1.5rem 2rem;
+  overflow-y: auto;
+}
+
+.hasilverifikasi-tabs {
+  display: flex;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 1.5rem;
+}
+
+.hasilverifikasi-tab {
+  padding: 0.75rem 1.25rem;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  color: #6b7280;
+  font-weight: 500;
+  background: none;
+  border: none;
+}
+.hasilverifikasi-tab.active {
+  color: #2563eb;
+  border-color: #2563eb;
+  font-weight: 600;
+}
+
+.hasilverifikasi-tab-content {
+  display: none;
+}
+.hasilverifikasi-tab-content.active {
+  display: block;
+}
+
+.hasilverifikasi-data-table {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 1rem;
+  text-align: left;
+}
+
+.hasilverifikasi-data-label {
+  font-weight: 600;
+  color: #374151;
+}
+
+.hasilverifikasi-data-value {
+  color: #495057;
+  word-break: break-all;
+}
+
+.hasilverifikasi-footer {
+  padding: 1.5rem 2rem;
+  border-top: 1px solid #e5e7eb;
+  text-align: right;
+}
+
+/* Style untuk judul status dan pesan error */
+.hasilverifikasi-status-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+.hasilverifikasi-card.error .hasilverifikasi-status-title {
+  color: #dc3545;
+}
+
+.hasilverifikasi-subtitle {
+  font-size: 1.1rem;
+  color: #6c757d;
+  margin-bottom: 2rem;
+}
+
+.hasilverifikasi-error-message {
+  font-size: 1.1rem;
+  color: #555;
+}
+
+.hasilverifikasi-back-btn {
+  background: #6c757d;
+  color: white;
+  border: none;
+  padding: 0.7rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.hasilverifikasi-back-btn:hover {
+  background: #5a6268;
+}
+.hasilverifikasi-card.error .hasilverifikasi-back-btn,
+.hasilverifikasi-footer .hasilverifikasi-back-btn {
+  margin-top: 1.5rem;
+}
+
+/* Loader */
+.hasilverifikasi-loader {
+  border: 8px solid #f3f3f3;
+  border-top: 8px solid #3498db;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 768px) {
+  .hasilverifikasi-card {
+    padding: 2rem 1.5rem;
+  }
+  .hasilverifikasi-status-title {
+    font-size: 1.5rem;
+  }
+  .hasilverifikasi-data-table {
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: 0.5rem;
+  }
+  .hasilverifikasi-data-table .hasilverifikasi-data-label {
+    text-align: center;
+  }
+  .hasilverifikasi-data-table .hasilverifikasi-data-value {
+    margin-bottom: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .hasilverifikasi-card {
+    padding: 1.5rem 1rem;
+  }
+  .hasilverifikasi-status-title {
+    font-size: 1.3rem;
+  }
+  .hasilverifikasi-tab {
+    padding: 0.75rem 0.5rem;
+    font-size: 0.9rem;
+  }
+}
