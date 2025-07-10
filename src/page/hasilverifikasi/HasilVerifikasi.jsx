@@ -17,13 +17,12 @@ export default function HasilVerifikasi() {
   const [activeTab, setActiveTab] = useState('data');
 
   useEffect(() => {
-    // Logika useEffect tetap sama, tidak perlu diubah
     if (!hash) {
       setError('Hash tidak ditemukan di URL.');
       setLoading(false);
       return;
     }
-
+    console.log(hash);
     const verifyCertificate = async () => {
       try {
         setLoading(true);
@@ -31,6 +30,7 @@ export default function HasilVerifikasi() {
 
         const contract = new web3Read.eth.Contract(contractABI, CONTRACT_ADDRESS);
         const cert = await contract.methods.findSertifikatHash(hash).call();
+        console.log(cert);
 
         if (cert.id === '0x'.padEnd(66, '0')) {
           throw new Error('Sertifikat tidak valid atau hash tidak terdaftar.');
@@ -56,7 +56,7 @@ export default function HasilVerifikasi() {
             nomorBlok: Number(blk.number),
             hashBlok: blk.hash,
             parentHash: blk.parentHash,
-            timestamp: new Date(Number(blk.timestamp) * 1000).toLocaleString('id-ID'),
+            timestamp: new Date(Number(cert.timestamp) * 1000).toLocaleString('id-ID'),
             transactions_count: blk.transactions.length,
           },
         });

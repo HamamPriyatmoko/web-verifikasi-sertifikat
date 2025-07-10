@@ -1,4 +1,3 @@
-// src/components/VerificationModal/VerificationModal.jsx
 import React, { useState } from 'react';
 import { FaFilePdf, FaCheckCircle } from 'react-icons/fa';
 
@@ -10,6 +9,7 @@ export default function VerificationModal({ result, onClose }) {
   if (!result) return null;
   console.log(result);
   const { data, info_blok } = result;
+  console.log(info_blok);
 
   const Tab = ({ name, label }) => (
     <button
@@ -76,12 +76,7 @@ export default function VerificationModal({ result, onClose }) {
               <span className="verifikasi-data-label">Nomor Blok:</span>
               <span className="verifikasi-data-value">{info_blok.nomorBlok}</span>
               <span className="verifikasi-data-label">Timestamp:</span>
-              <span className="verifikasi-data-value">
-                {new Date(Number(info_blok.timestamp) * 1000).toLocaleString('id-ID', {
-                  dateStyle: 'full',
-                  timeStyle: 'long',
-                })}
-              </span>
+              <span className="verifikasi-data-value">{info_blok.timestamp}</span>
               <span className="verifikasi-data-label">Hash Blok:</span>
               <span className="verifikasi-data-value">{info_blok.hashBlok}</span>
               <span className="verifikasi-data-label">Parent Hash:</span>

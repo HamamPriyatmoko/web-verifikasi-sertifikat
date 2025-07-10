@@ -7,6 +7,18 @@ import DownloadPdfButton from '../../components/ButtonDownload/DownloadPdfButton
 
 const API_BASE = import.meta.env.VITE_API_BASE;
 
+const formatTimestamp = (timestamp) => {
+  if (!timestamp) return '-';
+
+  const date = new Date(timestamp * 1000);
+
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const year = date.getFullYear();
+
+  return `${day}-${month}-${year}`;
+};
+
 export default function DaftarSertifikat() {
   const [allData, setAllData] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -20,7 +32,11 @@ export default function DaftarSertifikat() {
     const fetchData = async () => {
       setLoading(true);
       try {
-        const res = await fetch(`${API_BASE}/api/sertifikat`);
+        const res = await fetch(`${API_BASE}/api/sertifikat`, {
+          headers: {
+            'ngrok-skip-browser-warning': 'true',
+          },
+        });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const { sertifikat = [] } = await res.json();
         setAllData(sertifikat);
@@ -98,6 +114,7 @@ export default function DaftarSertifikat() {
               <tr>
                 <th>NIM</th>
                 <th>Universitas</th>
+                <th>Waktu Terbit</th>
                 <th style={{ textAlign: 'center' }}>Action</th>
               </tr>
             </thead>
@@ -107,6 +124,7 @@ export default function DaftarSertifikat() {
                   <tr key={item.id}>
                     <td data-label="NIM">{item.nim}</td>
                     <td data-label="Universitas">{item.universitas || '-'}</td>
+                    <td data-label="Waktu Terbit">{formatTimestamp(item.timestamp)}</td>
                     <td data-label="Action" style={{ textAlign: 'center' }}>
                       <DownloadPdfButton
                         nim={item.nim}

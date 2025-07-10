@@ -31,6 +31,11 @@ const DownloadPdfButton = ({ nim, className, label }) => {
 
       const resMeta = await fetch(
         `${API_GATEWAY}/api/certificate/metadata?cid=${cidDetail}&nim=${nim}`,
+        {
+          headers: {
+            'ngrok-skip-browser-warning': 'true',
+          },
+        },
       );
       if (!resMeta.ok) throw new Error('Gagal mengambil metadata dari IPFS');
       const { nama, jurusan, fakultas, tahunLulus } = await resMeta.json();

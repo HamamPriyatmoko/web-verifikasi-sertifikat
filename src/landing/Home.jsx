@@ -41,6 +41,11 @@ export default function Home() {
       const blk = await web3Read.eth.getBlock(cert.blockNumber);
       const metaRes = await fetch(
         `${API_URL}/api/certificate/metadata?cid=${cert.cidDetail}&nim=${cert.nim}`,
+        {
+          headers: {
+            'ngrok-skip-browser-warning': 'true',
+          },
+        },
       );
       if (!metaRes.ok) throw new Error('Gagal mengambil detail sertifikat dari IPFS.');
       const meta = await metaRes.json();
@@ -80,7 +85,13 @@ export default function Home() {
       const fd = new FormData();
       fd.append('file_sertifikat', file);
 
-      const res = await fetch(`${API_URL}/api/verify-pdf`, { method: 'POST', body: fd });
+      const res = await fetch(`${API_URL}/api/verify-pdf`, {
+        headers: {
+          'ngrok-skip-browser-warning': 'true',
+        },
+        method: 'POST',
+        body: fd,
+      });
       const body = await res.json();
 
       if (!res.ok) throw new Error(body.error || 'Gagal mengekstrak data dari PDF.');

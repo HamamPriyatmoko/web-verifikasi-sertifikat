@@ -45,9 +45,14 @@ const Dashboard = () => {
     const fetchUniversitas = async () => {
       try {
         setLoadingUniversitas(true);
-        const res = await fetch(`${API_URL}/api/universitas`);
+        const res = await fetch(`${API_URL}/api/universitas`, {
+          headers: {
+            'ngrok-skip-browser-warning': 'true',
+          },
+        });
         if (!res.ok) throw new Error('Gagal mengambil daftar universitas');
         const data = await res.json();
+        console.log(`Ini adalah datanya`, data);
         setUniversitasList(data);
       } catch (error) {
         toast.error(error.message);
@@ -68,7 +73,11 @@ const Dashboard = () => {
     const fetchFakultas = async () => {
       try {
         setLoadingFakultas(true);
-        const res = await fetch(`${API_URL}/api/universitas/${selectedUniversitas}/fakultas`);
+        const res = await fetch(`${API_URL}/api/universitas/${selectedUniversitas}/fakultas`, {
+          headers: {
+            'ngrok-skip-browser-warning': 'true',
+          },
+        });
         if (!res.ok) throw new Error('Gagal mengambil daftar fakultas');
         const data = await res.json();
         setFakultasList(data);
@@ -90,7 +99,11 @@ const Dashboard = () => {
     const fetchJurusan = async () => {
       try {
         setLoadingJurusan(true);
-        const res = await fetch(`${API_URL}/api/fakultas/${selectedFakultas}/jurusan`);
+        const res = await fetch(`${API_URL}/api/fakultas/${selectedFakultas}/jurusan`, {
+          headers: {
+            'ngrok-skip-browser-warning': 'true',
+          },
+        });
         if (!res.ok) throw new Error('Gagal mengambil daftar jurusan');
         const data = await res.json();
         setJurusanList(data);
@@ -198,7 +211,13 @@ const Dashboard = () => {
       console.log(formData);
 
       toast.loading('1/2 Mengunggah file ke IPFS & Hashing...', { id: toastId });
-      const res = await fetch(`${API_URL}/api/sertifikat`, { method: 'POST', body: fd });
+      const res = await fetch(`${API_URL}/api/sertifikat`, {
+        headers: {
+          'ngrok-skip-browser-warning': 'true',
+        },
+        method: 'POST',
+        body: fd,
+      });
       console.log(res);
       const body = await res.json();
       if (!res.ok) throw new Error(body.error || 'Upload atau hashing gagal.');

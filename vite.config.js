@@ -8,7 +8,8 @@ export default defineConfig({
     react(),
     // basicSsl(), // <-- 2. Tambahkan plugin di sini
   ],
-  // server: {
-  //   host: true, // <-- 3. Pastikan host diatur agar bisa diakses di jaringan
-  // },
+  server: {
+    allowedHosts: ['.ngrok-free.app'],
+    host: true, // <-- 3. Pastikan host diatur agar bisa diakses di jaringan
+  },
 });
