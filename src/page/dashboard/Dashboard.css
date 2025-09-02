@@ -1,6 +1,3 @@
-/* src/page/dashboard/Dashboard.css (Versi Final dengan Desain Input Minimalis) */
-
-/* -- WADAH UTAMA HALAMAN -- */
 .dashboard-page-content {
   flex-grow: 1;
   padding: 2rem;
@@ -17,7 +14,6 @@
   overflow: hidden;
 }
 
-/* -- STEPPER / INDIKATOR LANGKAH -- */
 .stepper {
   display: flex;
   padding: 1.5rem 2rem;
@@ -84,13 +80,12 @@
   color: var(--brand-dark-blue, #1e3a8a);
   margin: 0 0 2rem 0;
 }
-/* Cari blok .form-row di Dashboard.css dan ganti dengan ini */
 
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1.5rem;
-  align-items: start; /* Tambahan untuk memastikan perataan vertikal dari atas */
+  align-items: start; 
 }
 
 .form-group {
